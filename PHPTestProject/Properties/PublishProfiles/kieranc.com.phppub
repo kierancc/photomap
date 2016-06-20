@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <DeleteExistingFiles>False</DeleteExistingFiles>
+    <SkipRemoteFilesCheck>False</SkipRemoteFilesCheck>
+    <publishUrl>ftp.kieranc.com</publishUrl>
+    <UserName>kieran8</UserName>
+    <_SavePWD>True</_SavePWD>
+    <FtpSitePath>public_html/photos</FtpSitePath>
+    <FtpPassiveMode>False</FtpPassiveMode>
+    <FtpSecurity>Explicit</FtpSecurity>
+    <WebPublishMethod>FTP</WebPublishMethod>
+  </PropertyGroup>
+</Project>

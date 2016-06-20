@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Name>PHPTestProject</Name>
+    <ProjectGuid>26d02644-b030-4179-a4b0-1fdae8955ad2</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>
+    </RootNamespace>
+    <ProjectTypeGuids>{A0786B88-2ADB-4C21-ABE8-AA2D79766269}</ProjectTypeGuids>
+    <AssemblyName>PHPTestProject</AssemblyName>
+    <SaveServerSettingsInUserFile>false</SaveServerSettingsInUserFile>
+    <Runtime>PHP</Runtime>
+    <RuntimeVersion>5.6</RuntimeVersion>
+    <EnvName>PHPDev</EnvName>
+    <PHPDevHostName>localhost</PHPDevHostName>
+    <PHPDevAutoPort>true</PHPDevAutoPort>
+    <CustomXdebugPort>9000</CustomXdebugPort>
+    <PublishEvent>None</PublishEvent>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <IncludeDebugInformation>true</IncludeDebugInformation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <IncludeDebugInformation>false</IncludeDebugInformation>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="index.php" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="script\" />
+    <Folder Include="script\jquery\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="script\jquery\jquery-3.0.0.js" />
+    <Content Include="script\LoadPhotosControl.js" />
+    <Content Include="script\Photo.js" />
+    <Content Include="script\PhotoManager.js" />
+    <Content Include="script\PhotoViewer.js" />
+  </ItemGroup>
+</Project>
