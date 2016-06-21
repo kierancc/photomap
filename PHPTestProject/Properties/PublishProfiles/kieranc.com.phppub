@@ -3,7 +3,7 @@
   <PropertyGroup>
     <DeleteExistingFiles>False</DeleteExistingFiles>
     <SkipRemoteFilesCheck>False</SkipRemoteFilesCheck>
-    <publishUrl>ftp.kieranc.com</publishUrl>
+    <publishUrl>secure26.webhostinghub.com</publishUrl>
     <UserName>kieran8</UserName>
     <_SavePWD>True</_SavePWD>
     <FtpSitePath>public_html/photos</FtpSitePath>

@@ -37,7 +37,7 @@
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: 43.6775533333333, lng: 4.62713833333333 },
-                zoom: 12
+                zoom: 3
             });
 
             var loadPhotosControlDiv = document.createElement('div');
@@ -46,6 +46,14 @@
             loadPhotosControlDiv.index = 1;
             map.controls[google.maps.ControlPosition.TOP_CENTER].push(loadPhotosControlDiv);
         }
+
+        $(window).resize(function () {
+            // Resize any photoviewer
+            if (photoManager.PhotoViewer != null) {
+                photoManager.PhotoViewer.LoadPhoto();
+                photoManager.PhotoViewer.ShowPhoto(false);
+            }
+        });
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD1vK0IbVjCnwIH-Qjnb6deC6EDktJPrWI&callback=initMap"
             async defer>

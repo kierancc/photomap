@@ -43,8 +43,10 @@
             });
 
             marker.addListener('click', function () {
-                var photoViewerDiv = document.createElement('div');
-                var photoViewer = new PhotoViewer(photoViewerDiv, this.title);
+                var photoViewer = new PhotoViewer(this.title);
+                photoViewer.LoadPhoto();
+                photoViewer.ShowPhoto(true);
+                photoManager.PhotoViewer = photoViewer;
             });
 
             markers.push(marker);
