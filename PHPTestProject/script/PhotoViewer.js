@@ -2,21 +2,38 @@
 function PhotoViewer(filename) {
     // Save variables
     this.filename = filename;
-
-    
 }
 
 PhotoViewer.prototype.LoadPhoto = function () {
     // Delete any old viewer control
     $('#photodiv').empty();
+    $('#photodiv').hide();
 
-    // Set up the control
+    // Create the containing div
+    var containerDiv = document.createElement('div');
+    containerDiv.id = "PhotoViewerContainer";
+    $('#photodiv').append(containerDiv);
+
+    // Create the "toolbar" div
+    var toolbarDiv = document.createElement('div');
+    toolbarDiv.id = "PhotoViewerToolbar";
+    var closeButton = document.createElement('a');
+    closeButton.href = "#";
+    closeButton.innerText = "X";
+    $(toolbarDiv).append($(closeButton));
+
+    $(closeButton).click(function () {
+        photoManager.PhotoViewer.ClosePhoto();
+    });
+
+    $(containerDiv).append($(toolbarDiv));
+
+    // Set up the photo control
     var controlDiv = document.createElement('div');
     controlDiv.id = "PhotoViewer";
 
     // Add the control to the parent div
-    $('#photodiv').append($(controlDiv));
-    $('#photodiv').hide();
+    $(containerDiv).append($(controlDiv));
 
     var viewWidth = $(window).width();
     var viewHeight = $(window).height();
@@ -40,8 +57,6 @@ PhotoViewer.prototype.LoadPhoto = function () {
             photo.width *= ratio;
         }
 
-        $('#photodiv').width = photo.width;
-        $('#photodiv').height = photo.height;
         $(controlDiv).empty().append(photo);
     }
     photo.onerror = function () {
@@ -59,4 +74,10 @@ PhotoViewer.prototype.ShowPhoto = function (animate) {
     else {
         $('#photodiv').show();
     }
+}
+
+PhotoViewer.prototype.ClosePhoto = function () {
+    $('#photodiv').hide();
+    $('#photodiv').empty();
+    photoManager.PhotoViewer = null;
 }

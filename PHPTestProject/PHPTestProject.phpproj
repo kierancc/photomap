@@ -28,6 +28,7 @@
     <Compile Include="index.php" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="style\" />
     <Folder Include="script\" />
     <Folder Include="script\jquery\" />
   </ItemGroup>
@@ -37,5 +38,6 @@
     <Content Include="script\Photo.js" />
     <Content Include="script\PhotoManager.js" />
     <Content Include="script\PhotoViewer.js" />
+    <Content Include="style\PhotoViewer.css" />
   </ItemGroup>
 </Project>

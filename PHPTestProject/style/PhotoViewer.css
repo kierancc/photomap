@@ -1,0 +1,14 @@
+﻿#PhotoViewerContainer {
+
+}
+
+#PhotoViewerToolbar {
+    height: 25px;
+    width: 100%;
+    background-color: lightgray;
+    text-align: right;
+}
+
+#PhotoViewerToolbar a {
+    font-size: x-large;
+}

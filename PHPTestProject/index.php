@@ -20,6 +20,7 @@
             transform: translate(-50%, -50%);
         }
     </style>
+    <link rel="stylesheet" href="style/PhotoViewer.css" />
     <script src="script/Photo.js"></script>
     <script src="script/LoadPhotosControl.js"></script>
     <script src="script/PhotoManager.js"></script>
