@@ -11,6 +11,9 @@
 # Photos
 photos/
 
+# Database config
+database.php
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
