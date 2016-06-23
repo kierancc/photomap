@@ -1,4 +1,6 @@
-﻿function LoadPhotosControl(controlDiv, map) {
+﻿/// <reference path="jquery/jquery-3.0.0.js" />
+
+function LoadPhotosControl(controlDiv, map) {
     // Set CSS for the control border.
     var controlUI = document.createElement('div');
     controlUI.style.backgroundColor = '#fff';
@@ -25,31 +27,35 @@
     // Setup the click event listener
     controlUI.addEventListener('click', function () {
         photos = [];
-        photos.push(new Photo("P3142088.jpg", 43.6775533333333, 4.62713833333333));
-        photos.push(new Photo("P3142126.jpg", 43.106345, 2.97561666666667));
-        photos.push(new Photo("P3172228.jpg", 41.3850533333333, 2.17288833333333));
-        photos.push(new Photo("P3222334.jpg", 37.1773466666667, -3.59853666666667));
 
-        for (var i = 0; i < photos.length; i++) {
-            var position = {};
-            position['lat'] = photos[i].GetLatitude();
-            position['lng'] = photos[i].GetLongitude();
-            var fileName = photos[i].GetFilename();
-
-            var marker = new google.maps.Marker({
-                position: position,
-                map: map,
-                title: fileName
+        $.getJSON('../config/database.php', function (data) {
+            $.each(data, function (key, val) {
+                photos.push(new Photo(val.filename, parseFloat(val.latitude), parseFloat(val.longitude)));
             });
 
-            marker.addListener('click', function () {
-                var photoViewer = new PhotoViewer(this.title);
-                photoViewer.LoadPhoto();
-                photoViewer.ShowPhoto(true);
-                photoManager.PhotoViewer = photoViewer;
-            });
+            for (var i = 0; i < photos.length; i++) {
+                var position = {};
+                position['lat'] = photos[i].GetLatitude();
+                position['lng'] = photos[i].GetLongitude();
+                var fileName = photos[i].GetFilename();
 
-            markers.push(marker);
-        }
+                var marker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    title: fileName
+                });
+
+                marker.addListener('click', function () {
+                    var photoViewer = new PhotoViewer(this.title);
+                    photoViewer.LoadPhoto();
+                    photoViewer.ShowPhoto(true);
+                    photoManager.PhotoViewer = photoViewer;
+                });
+
+                markers.push(marker);
+            }
+        });
+
+        
     });
 }

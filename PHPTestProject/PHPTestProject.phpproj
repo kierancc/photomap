@@ -17,6 +17,8 @@
     <PHPDevAutoPort>true</PHPDevAutoPort>
     <CustomXdebugPort>9000</CustomXdebugPort>
     <PublishEvent>None</PublishEvent>
+    <SpecificPageValue>index.php</SpecificPageValue>
+    <StartAction>SpecificPage</StartAction>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <IncludeDebugInformation>true</IncludeDebugInformation>
@@ -25,9 +27,11 @@
     <IncludeDebugInformation>false</IncludeDebugInformation>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="config\database.php" />
     <Compile Include="index.php" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="config\" />
     <Folder Include="style\" />
     <Folder Include="script\" />
     <Folder Include="script\jquery\" />
