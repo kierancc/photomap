@@ -28,7 +28,7 @@ function LoadPhotosControl(controlDiv, map) {
     controlUI.addEventListener('click', function () {
         photos = [];
 
-        $.getJSON('../config/database.php', function (data) {
+        $.getJSON('../dataaccess/getphotos.php', function (data) {
             $.each(data, function (key, val) {
                 photos.push(new Photo(val.filename, parseFloat(val.latitude), parseFloat(val.longitude)));
             });

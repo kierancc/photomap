@@ -28,10 +28,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="config\database.php" />
+    <Compile Include="dataaccess\getphotos.php" />
     <Compile Include="index.php" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="config\" />
+    <Folder Include="dataaccess\" />
     <Folder Include="style\" />
     <Folder Include="script\" />
     <Folder Include="script\jquery\" />
