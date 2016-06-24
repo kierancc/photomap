@@ -33,6 +33,9 @@ function LoadPhotosControl(controlDiv, map) {
                 photos.push(new Photo(val.filename, parseFloat(val.latitude), parseFloat(val.longitude)));
             });
 
+            photoManager.CalculatePhotoDistances();
+            photoManager.Clusters = photoManager.Cluster();
+
             for (var i = 0; i < photos.length; i++) {
                 var position = {};
                 position['lat'] = photos[i].GetLatitude();
