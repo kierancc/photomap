@@ -87,17 +87,19 @@ PhotoManager.prototype.Cluster = function () {
     var clusters = new Array();
 
     for (var i = 0; i < photos.length; i++) {
-        clusters.push(new Cluster(photos[i].GetFilename()));
+        clusters.push(new Cluster(photos[i]));
     }
 
     var newDistanceMatrix = this.CopyDistanceMatrix();
+
+    var clusterThreshold = GetClusterThreshold();
 
     while (newDistanceMatrix.length > 1) {
         // Determine which two clusters to merge, and their distance
         var nextCluster = this.GetClosestCluster(newDistanceMatrix);
 
         // If the smallest distance between clusters is greater than the threshold, then break
-        if (nextCluster.distance > 500000) break;
+        if (nextCluster.distance > clusterThreshold) break;
 
         // Add a new row and column for the new cluster
         newDistanceMatrix.push(new Array(newDistanceMatrix.length + 1));
@@ -151,16 +153,16 @@ PhotoManager.prototype.PhotoViewer = null;
 PhotoManager.prototype.PhotoDistances = null;
 PhotoManager.prototype.Clusters = null;
 
-function Cluster(filename) {
+function Cluster(photo) {
     this.Photos = [];
 
-    if (filename !== undefined) {
-        this.Photos.push(filename);
+    if (photo !== undefined) {
+        this.Photos.push(photo);
     }
 }
 
-Cluster.prototype.AddPhoto = function(filename) {
-    this.Photos.push(filename);
+Cluster.prototype.AddPhoto = function(photo) {
+    this.Photos.push(photo);
 }
 
 Cluster.prototype.AddPhotos = function (photos) {
@@ -171,6 +173,30 @@ Cluster.prototype.GetPhotos = function () {
     return this.Photos;
 }
 
+Cluster.prototype.GetLatitude = function () {
+    var latAgg = 0;
+
+    for (var i = 0; i < this.Photos.length; i++) {
+        latAgg += this.Photos[i].GetLatitude();
+    }
+
+    latAgg /= parseFloat(this.Photos.length);
+
+    return latAgg;
+}
+
+Cluster.prototype.GetLongitude = function () {
+    var longAgg = 0;
+
+    for (var i = 0; i < this.Photos.length; i++) {
+        longAgg += this.Photos[i].GetLongitude();
+    }
+
+    longAgg /= parseFloat(this.Photos.length);
+
+    return longAgg;
+}
+
 function MergeClusters(cluster1, cluster2) {
     var newCluster = new Cluster();
 
@@ -178,6 +204,14 @@ function MergeClusters(cluster1, cluster2) {
     newCluster.AddPhotos(cluster2.GetPhotos());
     
     return newCluster;
+}
+
+//TODO: Move this function
+// Returns the (approximate) distance in meters per centimeter of map
+function GetClusterThreshold() {
+    var zoomLevel = map.zoom;
+    var mapScale = 591657550.500000 / Math.pow(2, (zoomLevel - 1));
+    return (mapScale / 100.0) / 2.0;
 }
 
 //TODO: Move this to a util script or something

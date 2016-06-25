@@ -36,27 +36,47 @@ function LoadPhotosControl(controlDiv, map) {
             photoManager.CalculatePhotoDistances();
             photoManager.Clusters = photoManager.Cluster();
 
-            for (var i = 0; i < photos.length; i++) {
-                var position = {};
-                position['lat'] = photos[i].GetLatitude();
-                position['lng'] = photos[i].GetLongitude();
-                var fileName = photos[i].GetFilename();
+            // Clear any markers
+            for (var i = 0; i < markers.length; i++) {
+                markers[i].setMap(null);
+            }
+
+            markers = [];
+
+            for (var i = 0; i < photoManager.Clusters.length; i++) {
+                var position = { lat: photoManager.Clusters[i].GetLatitude(), lng: photoManager.Clusters[i].GetLongitude() };
+                var name = "Cluster " + i;
 
                 var marker = new google.maps.Marker({
                     position: position,
                     map: map,
-                    title: fileName
-                });
-
-                marker.addListener('click', function () {
-                    var photoViewer = new PhotoViewer(this.title);
-                    photoViewer.LoadPhoto();
-                    photoViewer.ShowPhoto(true);
-                    photoManager.PhotoViewer = photoViewer;
+                    title: name
                 });
 
                 markers.push(marker);
             }
+
+            //for (var i = 0; i < photos.length; i++) {
+            //    var position = {};
+            //    position['lat'] = photos[i].GetLatitude();
+            //    position['lng'] = photos[i].GetLongitude();
+            //    var fileName = photos[i].GetFilename();
+
+            //    var marker = new google.maps.Marker({
+            //        position: position,
+            //        map: map,
+            //        title: fileName
+            //    });
+
+            //    marker.addListener('click', function () {
+            //        var photoViewer = new PhotoViewer(this.title);
+            //        photoViewer.LoadPhoto();
+            //        photoViewer.ShowPhoto(true);
+            //        photoManager.PhotoViewer = photoViewer;
+            //    });
+
+            //    markers.push(marker);
+            //}
         });
 
         
