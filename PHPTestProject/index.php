@@ -26,6 +26,7 @@
     <script src="script/PhotoManager.js"></script>
     <script src="script/PhotoViewer.js"></script>
     <script src="script/jquery/jquery-3.0.0.js"></script>
+    <script src="script/jquery/jquery-ui.js"></script>
 </head>
 <body>
     <div id="map"></div>

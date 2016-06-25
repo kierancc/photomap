@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="script\jquery\jquery-3.0.0.js" />
+    <Content Include="script\jquery\jquery-ui.js" />
     <Content Include="script\LoadPhotosControl.js" />
     <Content Include="script\Photo.js" />
     <Content Include="script\PhotoManager.js" />

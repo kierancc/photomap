@@ -27,6 +27,10 @@ PhotoViewer.prototype.LoadPhoto = function () {
     });
 
     $(containerDiv).append($(toolbarDiv));
+    $(containerDiv).draggable({
+        handle: "#PhotoViewerToolbar",
+        cursor: "pointer"
+    });
 
     // Set up the photo control
     var controlDiv = document.createElement('div');
@@ -43,7 +47,6 @@ PhotoViewer.prototype.LoadPhoto = function () {
     photo.src = relativeFile;
     photo.onload = function () {
         // Set the viewer dimensions
-
         // If the image width is > 75% of the vievwport, scale it to 75%
         if (photo.width > viewWidth * 0.75) {
             var ratio = viewWidth * 0.75 / photo.width;
