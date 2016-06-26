@@ -50,8 +50,30 @@ function LoadPhotosControl(controlDiv, map) {
                 var marker = new google.maps.Marker({
                     position: position,
                     map: map,
-                    title: name
                 });
+
+                var clusterPhotos = photoManager.Clusters[i].GetPhotos();
+
+                if (clusterPhotos.length == 1) {
+                    marker.type = 'photo';
+                    marker.setTitle(clusterPhotos[0].GetFilename());
+                    marker.id = clusterPhotos[0].GetFilename();
+
+                    marker.addListener('click', function () {
+                        var photoViewer = new PhotoViewer(this.id);
+                        photoViewer.LoadPhoto();
+                        photoViewer.ShowPhoto(true);
+                        photoManager.PhotoViewer = photoViewer;
+                    });
+                }
+
+                else {
+                    marker.type = 'cluster';
+                    marker.id = i;
+                    marker.addListener('click', function () {
+                        alert(this.id);
+                    });
+                }
 
                 markers.push(marker);
             }
