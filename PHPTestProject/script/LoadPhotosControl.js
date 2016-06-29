@@ -54,14 +54,15 @@ function LoadPhotosControl(controlDiv, map) {
 
                 var clusterPhotos = photoManager.Clusters[i].GetPhotos();
 
+                // Single photo case
                 if (clusterPhotos.length == 1) {
                     marker.type = 'photo';
                     marker.setTitle(clusterPhotos[0].GetFilename());
-                    marker.id = clusterPhotos[0].GetFilename();
+                    marker.id = i
 
                     marker.addListener('click', function () {
-                        var photoViewer = new PhotoViewer(this.id);
-                        photoViewer.LoadPhoto();
+                        var photoViewer = new PhotoViewer(PhotoViewer.Type.SINGLE, photoManager.Clusters[this.id].GetPhotos());
+                        photoViewer.LoadFirstPhoto();
                         photoViewer.ShowPhoto(true);
                         photoManager.PhotoViewer = photoViewer;
                     });
@@ -70,8 +71,9 @@ function LoadPhotosControl(controlDiv, map) {
                 else {
                     marker.type = 'cluster';
                     marker.id = i;
+
                     marker.addListener('click', function () {
-                        alert(this.id);
+                        var photoViewer = new PhotoViewer(PhotoViewer.Type.CLUSTER, photoManager.Clusters[this.id].GetPhotos());
                     });
                 }
 

@@ -1,10 +1,13 @@
 ﻿/// <reference path="jquery/jquery-3.0.0.js" />
-function PhotoViewer(filename) {
+function PhotoViewer(type, photos) {
     // Save variables
-    this.filename = filename;
+    this.type = type;
+    this.photos = photos;
+    this.index = 0;
+    this.images = [];
 }
 
-PhotoViewer.prototype.LoadPhoto = function () {
+PhotoViewer.prototype.LoadFirstPhoto = function () {
     // Delete any old viewer control
     $('#photodiv').empty();
     $('#photodiv').hide();
@@ -42,7 +45,7 @@ PhotoViewer.prototype.LoadPhoto = function () {
     var viewWidth = $(window).width();
     var viewHeight = $(window).height();
 
-    var relativeFile = photoManager.GetRelativePathToPhoto(this.filename);
+    var relativeFile = photoManager.GetRelativePathToPhoto(this.photos[0].GetFilename());
     var photo = new Image();
     photo.src = relativeFile;
     photo.onload = function () {
@@ -61,6 +64,8 @@ PhotoViewer.prototype.LoadPhoto = function () {
         }
 
         $(controlDiv).empty().append(photo);
+
+        this.images.push(photo);
     }
     photo.onerror = function () {
         $(controlDiv).empty().html('Photo failed to load');
@@ -68,6 +73,8 @@ PhotoViewer.prototype.LoadPhoto = function () {
 
     $(controlDiv).empty().html('Loading photo...');
 }
+
+PhotoViewer.Type = { SINGLE: 1, CLUSTER: 2 }
 
 PhotoViewer.prototype.ShowPhoto = function (animate) {
     // Show the parent div
