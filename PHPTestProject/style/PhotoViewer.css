@@ -18,3 +18,34 @@
     color: black;
     background-color: lightblue;
 }
+
+#PhotoViewerPrevButton {
+    width: 100px;
+    height: 100px;
+    background-color: lightgrey;
+    text-align: center;
+    font-size: xx-large;
+    color: darkgrey;
+    opacity: 0.4;
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+    line-height: 100px;
+    cursor: pointer;
+}
+
+#PhotoViewerNextButton {
+    width: 100px;
+    height: 100px;
+    background-color: lightgrey;
+    text-align: center;
+    font-size: xx-large;
+    color: darkgrey;
+    opacity: 0.4;
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translate(-100%, -50%);
+    line-height: 100px;
+    cursor: pointer;
+}

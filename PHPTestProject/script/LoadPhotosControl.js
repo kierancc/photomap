@@ -74,6 +74,9 @@ function LoadPhotosControl(controlDiv, map) {
 
                     marker.addListener('click', function () {
                         var photoViewer = new PhotoViewer(PhotoViewer.Type.CLUSTER, photoManager.Clusters[this.id].GetPhotos());
+                        photoViewer.LoadFirstPhoto();
+                        photoViewer.ShowPhoto(true);
+                        photoManager.PhotoViewer = photoViewer;
                     });
                 }
 

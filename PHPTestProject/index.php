@@ -13,7 +13,7 @@
             height: 100%;
         }
         #photodiv {
-            position: fixed;
+            position: absolute;
             top: 50%;
             left: 50%;
             margin-right: -50%;
