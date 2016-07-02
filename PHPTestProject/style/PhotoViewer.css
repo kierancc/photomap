@@ -32,6 +32,7 @@
     transform: translate(0, -50%);
     line-height: 100px;
     cursor: pointer;
+    font-weight: bolder;
 }
 
 #PhotoViewerNextButton {
@@ -48,4 +49,5 @@
     transform: translate(-100%, -50%);
     line-height: 100px;
     cursor: pointer;
+    font-weight: bolder;
 }
