@@ -47,6 +47,13 @@ PhotoViewer.prototype.SetupViewer = function () {
         $(prevButton).click(function () {
             photoManager.PhotoViewer.ShowPrevPhoto();
         });
+        $(prevButton).hover(
+            function () {
+                $(this).fadeTo(150, 1);
+            },
+            function () {
+                $(this).fadeTo(150, 0);
+        });
         $(containerDiv).append(prevButton);
 
         var nextButton = document.createElement('div');
@@ -55,8 +62,20 @@ PhotoViewer.prototype.SetupViewer = function () {
         $(nextButton).click(function () {
             photoManager.PhotoViewer.ShowNextPhoto();
         });
+        $(nextButton).hover(
+            function () {
+                $(this).fadeTo(150, 1);
+            },
+            function () {
+                $(this).fadeTo(150, 0);
+        })
         $(containerDiv).append(nextButton);
     }
+}
+
+PhotoViewer.prototype.HidePrevNextButtons = function () {
+    $('#PhotoViewerPrevButton').fadeTo(100, 0);
+    $('#PhotoViewerNextButton').fadeTo(100, 0);
 }
 
 PhotoViewer.prototype.LoadFirstPhoto = function () {
@@ -143,6 +162,13 @@ PhotoViewer.prototype.ShowPhoto = function (animate) {
     }
     else {
         $('#photodiv').show();
+    }
+
+    // If this viewer is for a cluster, set a timer to fade out the prev/next buttons after a few seconds
+    if (this.type === PhotoViewer.Type.CLUSTER) {
+        window.setTimeout(function () {
+            photoManager.PhotoViewer.HidePrevNextButtons();
+        }, 3000);
     }
 }
 
