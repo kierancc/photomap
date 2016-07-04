@@ -57,7 +57,7 @@ function LoadPhotosControl(controlDiv, map) {
                 // Single photo case
                 if (clusterPhotos.length == 1) {
                     marker.type = 'photo';
-                    marker.setTitle(clusterPhotos[0].GetFilename());
+                    marker.setTitle("1 photo");
                     marker.id = i
 
                     marker.addListener('click', function () {
@@ -70,6 +70,7 @@ function LoadPhotosControl(controlDiv, map) {
 
                 else {
                     marker.type = 'cluster';
+                    marker.setTitle(clusterPhotos.length + " photos");
                     marker.id = i;
 
                     marker.addListener('click', function () {
@@ -82,30 +83,6 @@ function LoadPhotosControl(controlDiv, map) {
 
                 markers.push(marker);
             }
-
-            //for (var i = 0; i < photos.length; i++) {
-            //    var position = {};
-            //    position['lat'] = photos[i].GetLatitude();
-            //    position['lng'] = photos[i].GetLongitude();
-            //    var fileName = photos[i].GetFilename();
-
-            //    var marker = new google.maps.Marker({
-            //        position: position,
-            //        map: map,
-            //        title: fileName
-            //    });
-
-            //    marker.addListener('click', function () {
-            //        var photoViewer = new PhotoViewer(this.title);
-            //        photoViewer.LoadPhoto();
-            //        photoViewer.ShowPhoto(true);
-            //        photoManager.PhotoViewer = photoViewer;
-            //    });
-
-            //    markers.push(marker);
-            //}
-        });
-
-        
+        });    
     });
 }

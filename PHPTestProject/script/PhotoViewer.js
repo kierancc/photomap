@@ -22,14 +22,41 @@ PhotoViewer.prototype.SetupViewer = function () {
     // Create the "toolbar" div
     var toolbarDiv = document.createElement('div');
     toolbarDiv.id = "PhotoViewerToolbar";
+    var toolbarTable = document.createElement('table');
+    var toolbarTableRow = document.createElement('tr');
+
+    // Add an empty first cell
+    var toolbarTableFirstCell = document.createElement('td');
+    toolbarTableFirstCell.style.width = "33%";
+    toolbarTableRow.appendChild(toolbarTableFirstCell);
+
+    // Second cell has the current photo number and count
+    var toolbarTableTitleCell = document.createElement('td');
+    toolbarTableTitleCell.id = "PhotoViewerTitleCell";
+    toolbarTableTitleCell.style.width = "34%";
+    toolbarTableTitleCell.style.textAlign = "center";
+    toolbarTableTitleCell.style.fontWeight = "bolder";
+    toolbarTableTitleCell.innerText = this.index + 1 + " / " + this.photos.length;
+    toolbarTableRow.appendChild(toolbarTableTitleCell);
+    
     var closeButton = document.createElement('a');
     closeButton.href = "#";
     closeButton.innerText = "X";
     $(toolbarDiv).append($(closeButton));
-
+    
     $(closeButton).click(function () {
         photoManager.PhotoViewer.ClosePhoto();
     });
+
+    // Last cell has the close button
+    var toolbarTableLastCell = document.createElement('td');
+    toolbarTableLastCell.style.width = "33%";
+    toolbarTableLastCell.style.textAlign = "right";
+    toolbarTableLastCell.appendChild(closeButton);
+    toolbarTableRow.appendChild(toolbarTableLastCell);
+
+    toolbarTable.appendChild(toolbarTableRow);
+    toolbarDiv.appendChild(toolbarTable);
 
     $(containerDiv).append($(toolbarDiv));
 
@@ -167,6 +194,7 @@ PhotoViewer.prototype.ShowPhoto = function (animate) {
     // If this viewer is for a cluster, set a timer to fade out the prev/next buttons after a few seconds
     if (this.type === PhotoViewer.Type.CLUSTER) {
         window.setTimeout(function () {
+            if (photoManager.PhotoViewer !== null)
             photoManager.PhotoViewer.HidePrevNextButtons();
         }, 3000);
     }
@@ -176,18 +204,24 @@ PhotoViewer.prototype.ShowNextPhoto = function () {
     if (this.index + 1 < this.photos.length) {
         this.index++;
 
+        $('#PhotoViewerTitleCell').empty().text(this.index + 1 + " / " + this.photos.length);
+
         $('#PhotoViewer').hide();
         $('#PhotoViewer').empty();
         $('#PhotoViewer').append(this.images[this.index]);
         $('#PhotoViewer').fadeIn(100);
 
-        this.LoadNextPhoto();
+        if (this.images[this.index + 1] === undefined) {
+            this.LoadNextPhoto();
+        }
     }
 }
 
 PhotoViewer.prototype.ShowPrevPhoto = function () {
     if (this.index - 1 >= 0) {
         this.index--;
+
+        $('#PhotoViewerTitleCell').empty().text(this.index + 1 + " / " + this.photos.length);
 
         $('#PhotoViewer').hide();
         $('#PhotoViewer').empty();
