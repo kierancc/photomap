@@ -7,7 +7,6 @@
     width: 100%;
     background: -ms-linear-gradient(top, rgba(115,187,223,1) 0%,rgba(23,86,127,1) 100%);
     background: -webkit-linear-gradient(top, rgba(115,187,223,1) 0%,rgba(23,86,127,1) 100%);
-    /* text-align: right; */
     box-shadow: inset 0 -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
                 inset 0 1px 1px rgba(255,255,255,1); /*top internal highlight*/
     cursor: pointer;

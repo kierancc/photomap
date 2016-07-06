@@ -12,12 +12,24 @@
         #map {
             height: 100%;
         }
+        #modalpane {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            height: 100%;
+            width: 100%;
+            opacity: 0.7;
+            background-color: grey;
+            display: none;
+            z-index: 1;
+        }
         #photodiv {
             position: absolute;
             top: 50%;
             left: 50%;
             margin-right: -50%;
             transform: translate(-50%, -50%);
+            z-index: 2;
         }
     </style>
     <link rel="stylesheet" href="style/PhotoViewer.css" />
@@ -51,6 +63,7 @@
         }
 
         $(window).resize(function () {
+            //TODO: Fix this so that it works again
             // Resize any photoviewer
             if (photoManager.PhotoViewer != null) {
                 photoManager.PhotoViewer.LoadPhoto();
@@ -62,6 +75,7 @@
             async defer>
 
     </script>
+    <div id="modalpane"></div>
     <div id="photodiv"></div>
 </body>
 </html>

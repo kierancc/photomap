@@ -186,6 +186,7 @@ PhotoViewer.prototype.ShowPhoto = function (animate) {
     // Show the parent div
     if (animate) {
         $('#photodiv').fadeIn(1500);
+        $('#modalpane').show().fadeIn(1500);
     }
     else {
         $('#photodiv').show();
@@ -232,6 +233,7 @@ PhotoViewer.prototype.ShowPrevPhoto = function () {
 
 PhotoViewer.prototype.ClosePhoto = function () {
     $('#photodiv').fadeOut(1500);
+    $('#modalpane').fadeOut(1500);
     $('#photodiv').empty();
     photoManager.PhotoViewer = null;
 }
