@@ -7,6 +7,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
+            overflow: hidden;
         }
 
         #map {
@@ -27,9 +28,9 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            margin-right: -50%;
             transform: translate(-50%, -50%);
             z-index: 2;
+            display: none;
         }
     </style>
     <link rel="stylesheet" href="style/PhotoViewer.css" />
@@ -61,15 +62,6 @@
             loadPhotosControlDiv.index = 1;
             map.controls[google.maps.ControlPosition.TOP_CENTER].push(loadPhotosControlDiv);
         }
-
-        $(window).resize(function () {
-            //TODO: Fix this so that it works again
-            // Resize any photoviewer
-            if (photoManager.PhotoViewer != null) {
-                photoManager.PhotoViewer.LoadPhoto();
-                photoManager.PhotoViewer.ShowPhoto(false);
-            }
-        });
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD1vK0IbVjCnwIH-Qjnb6deC6EDktJPrWI&callback=initMap"
             async defer>

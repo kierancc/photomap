@@ -120,20 +120,6 @@ PhotoViewer.prototype.LoadFirstPhoto = function () {
     var photo = new Image();
     photo.src = relativeFile;
     photo.onload = function () {
-        // Set the viewer dimensions
-        // If the image width is > 75% of the vievwport, scale it to 75%
-        if (photo.width > viewWidth * 0.75) {
-            var ratio = viewWidth * 0.75 / photo.width;
-            photo.width = viewWidth * 0.75;
-            photo.height *= ratio;
-        }
-        // If the image height is > 75% of the viewport, scale it to 75%
-        if (photo.height > viewHeight * 0.75) {
-            var ratio = viewHeight * 0.75 / photo.height;
-            photo.height = viewHeight * 0.75;
-            photo.width *= ratio;
-        }
-
         $(controlDiv).empty().append(photo);
 
         photoManager.PhotoViewer.images.push(photo);
@@ -154,20 +140,6 @@ PhotoViewer.prototype.LoadNextPhoto = function () {
         var photo = new Image();
         photo.src = relativeFile;
         photo.onload = function () {
-            // Set the viewer dimensions
-            // If the image width is > 75% of the vievwport, scale it to 75%
-            if (photo.width > viewWidth * 0.75) {
-                var ratio = viewWidth * 0.75 / photo.width;
-                photo.width = viewWidth * 0.75;
-                photo.height *= ratio;
-            }
-            // If the image height is > 75% of the viewport, scale it to 75%
-            if (photo.height > viewHeight * 0.75) {
-                var ratio = viewHeight * 0.75 / photo.height;
-                photo.height = viewHeight * 0.75;
-                photo.width *= ratio;
-            }
-
             photoManager.PhotoViewer.images.push(photo);
         }
         photo.onerror = function () {

@@ -1,5 +1,14 @@
-﻿#PhotoViewerContainer {
+﻿#PhotoViewerContainer img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 75vw;
+    max-height: 75vh;
+    margin: auto;
+}
 
+#PhotoViewer {
+    background-color: grey;
 }
 
 #PhotoViewerToolbar {
