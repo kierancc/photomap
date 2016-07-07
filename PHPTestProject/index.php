@@ -35,7 +35,6 @@
     </style>
     <link rel="stylesheet" href="style/PhotoViewer.css" />
     <script src="script/Photo.js"></script>
-    <script src="script/LoadPhotosControl.js"></script>
     <script src="script/PhotoManager.js"></script>
     <script src="script/PhotoViewer.js"></script>
     <script src="script/jquery/jquery-3.0.0.js"></script>
@@ -44,24 +43,29 @@
 <body>
     <div id="map"></div>
     <script>
-        var photos = new Array();
-        var markers = new Array();
         var photoManager = new PhotoManager();
         
-        var map;
+        var map; // The global map object
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: 43.6775533333333, lng: 4.62713833333333 },
                 zoom: 3,
                 scaleControl: true
             });
-
-            var loadPhotosControlDiv = document.createElement('div');
-            var loadPhotosControl = new LoadPhotosControl(loadPhotosControlDiv, map);
-            
-            loadPhotosControlDiv.index = 1;
-            map.controls[google.maps.ControlPosition.TOP_CENTER].push(loadPhotosControlDiv);
         }
+
+        $(document).ready(function() {
+            $.when(photoManager.LoadPhotos())
+                .done(function () {
+
+                    photoManager.CalculatePhotoDistances();
+                    photoManager.Cluster();
+                    photoManager.CreateMarkers();
+                })
+                .fail(function() {
+                    alert('Failed to load photos!');
+                });
+        });
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD1vK0IbVjCnwIH-Qjnb6deC6EDktJPrWI&callback=initMap"
             async defer>
