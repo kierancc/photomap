@@ -52,6 +52,11 @@
                 zoom: 3,
                 scaleControl: true
             });
+
+            map.addListener('zoom_changed', function () {
+                photoManager.ClearAllMarkers(true);
+                photoManager.CreateMarkers();
+            });
         }
 
         $(document).ready(function() {
@@ -59,7 +64,8 @@
                 .done(function () {
 
                     photoManager.CalculatePhotoDistances();
-                    photoManager.Cluster();
+                    photoManager.SetupForCluster();
+                    photoManager.DoCluster();
                     photoManager.CreateMarkers();
                 })
                 .fail(function() {

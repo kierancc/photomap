@@ -16,8 +16,8 @@ PhotoManager.prototype.LoadPhotos = function () {
 }
 
 PhotoManager.prototype.CreateMarkers = function () {
-    for (var i = 0; i < this.Clusters.length; i++) {
-        var position = { lat: this.Clusters[i].GetLatitude(), lng: this.Clusters[i].GetLongitude() };
+    for (var i = 0; i < this.Clusters[map.zoom].length; i++) {
+        var position = { lat: this.Clusters[map.zoom][i].GetLatitude(), lng: this.Clusters[map.zoom][i].GetLongitude() };
         var name = "Cluster " + i;
 
         var marker = new google.maps.Marker({
@@ -25,7 +25,7 @@ PhotoManager.prototype.CreateMarkers = function () {
             map: map,
         });
 
-        var clusterPhotos = this.Clusters[i].GetPhotos();
+        var clusterPhotos = this.Clusters[map.zoom][i].GetPhotos();
 
         // Single photo case
         if (clusterPhotos.length == 1) {
@@ -34,7 +34,7 @@ PhotoManager.prototype.CreateMarkers = function () {
             marker.id = i
 
             marker.addListener('click', function () {
-                var photoViewer = new PhotoViewer(PhotoViewer.Type.SINGLE, photoManager.Clusters[this.id].GetPhotos());
+                var photoViewer = new PhotoViewer(PhotoViewer.Type.SINGLE, photoManager.Clusters[map.zoom][this.id].GetPhotos());
                 photoViewer.LoadFirstPhoto();
                 photoViewer.ShowPhoto(true);
                 photoManager.PhotoViewer = photoViewer;
@@ -47,7 +47,7 @@ PhotoManager.prototype.CreateMarkers = function () {
             marker.id = i;
 
             marker.addListener('click', function () {
-                var photoViewer = new PhotoViewer(PhotoViewer.Type.CLUSTER, photoManager.Clusters[this.id].GetPhotos());
+                var photoViewer = new PhotoViewer(PhotoViewer.Type.CLUSTER, photoManager.Clusters[map.zoom][this.id].GetPhotos());
                 photoViewer.LoadFirstPhoto();
                 photoViewer.ShowPhoto(true);
                 photoManager.PhotoViewer = photoViewer;
@@ -72,6 +72,8 @@ PhotoManager.prototype.ClearAllMarkers = function (deleteMarkers) {
 // Constants
 PhotoManager.prototype.PhotoPath = 'photos/';
 PhotoManager.prototype.R = 6371e3;
+PhotoManager.prototype.MAXZOOMLEVEL = 25;
+PhotoManager.prototype.MINZOOMLEVEL = 0;
 
 // Functions
 PhotoManager.prototype.GetRelativePathToPhoto = function(filename) {
@@ -129,6 +131,16 @@ PhotoManager.prototype.CopyDistanceMatrix = function () {
     return newDistanceMatrix;
 }
 
+PhotoManager.prototype.CopyClusterArray = function (srcArray) {
+    var dstArray = new Array(srcArray.length);
+
+    for (var i = 0; i < srcArray.length; i++) {
+        dstArray[i] = srcArray[i].Clone();
+    }
+    
+    return dstArray;
+}
+
 PhotoManager.prototype.GetClosestCluster = function (distanceMatrix) {
     var minDistance = Number.MAX_VALUE;
     var c1 = -1;
@@ -149,69 +161,92 @@ PhotoManager.prototype.GetClosestCluster = function (distanceMatrix) {
     return { distance: minDistance, cluster1: c1, cluster2: c2}
 }
 
-PhotoManager.prototype.Cluster = function () {
-    var clusters = new Array();
+PhotoManager.prototype.SetupForCluster = function () {
+    // Create the clusters data structure
+    this.Clusters = new Array(this.MAXZOOMLEVEL + 1); // Need to have max level + 1 elements since 0 is a valid zoom level
 
+    for (var i = 0 ; i < this.Clusters.length; i++) {
+        this.Clusters[i] = new Array();
+    }
+
+    // Initially populate the highest zoom level with each photo as its own cluster
     for (var i = 0; i < this.Photos.length; i++) {
-        clusters.push(new Cluster(this.Photos[i]));
+        this.Clusters[this.MAXZOOMLEVEL].push(new Cluster(this.Photos[i]));
     }
+}
 
+PhotoManager.prototype.DoCluster = function () {
     var newDistanceMatrix = this.CopyDistanceMatrix();
+    this.Cluster(this.MAXZOOMLEVEL, newDistanceMatrix);
+}
 
-    var clusterThreshold = GetClusterThreshold();
+PhotoManager.prototype.Cluster = function (zoomLevel, distanceMatrix) {
+    if (zoomLevel >= this.MINZOOMLEVEL) {
+        var clusterThreshold = GetClusterThreshold(zoomLevel);
 
-    while (newDistanceMatrix.length > 1) {
-        // Determine which two clusters to merge, and their distance
-        var nextCluster = this.GetClosestCluster(newDistanceMatrix);
+        while (distanceMatrix.length > 1) {
+            // Determine which two clusters to merge, and their distance
+            var nextCluster = this.GetClosestCluster(distanceMatrix);
 
-        // If the smallest distance between clusters is greater than the threshold, then break
-        if (nextCluster.distance > clusterThreshold) break;
+            // If the smallest distance between clusters is greater than the threshold, then break
+            if (nextCluster.distance > clusterThreshold) break;
 
-        // Add a new row and column for the new cluster
-        newDistanceMatrix.push(new Array(newDistanceMatrix.length + 1));
+            // Add a new row and column for the new cluster
+            distanceMatrix.push(new Array(distanceMatrix.length + 1));
 
-        // Populate the distances of every existing cluster that will remain to our new cluster
-        for (var i = 0; i < newDistanceMatrix.length - 1; i++) {
-            // Skip the ones that will be removed
-            if (i == nextCluster.cluster1 || i == nextCluster.cluster2) continue;
+            // Populate the distances of every existing cluster that will remain to our new cluster
+            for (var i = 0; i < distanceMatrix.length - 1; i++) {
+                // Skip the ones that will be removed
+                if (i == nextCluster.cluster1 || i == nextCluster.cluster2) continue;
 
-            // Determine the distance between this cluster and our new cluster by using max d[this, c1], d[this, c2]
-            var newDistance = Math.max(newDistanceMatrix[i][nextCluster.cluster1], newDistanceMatrix[i][nextCluster.cluster2]);
-            newDistanceMatrix[i].push(newDistance);
+                // Determine the distance between this cluster and our new cluster by using max d[this, c1], d[this, c2]
+                var newDistance = Math.max(distanceMatrix[i][nextCluster.cluster1], distanceMatrix[i][nextCluster.cluster2]);
+                distanceMatrix[i].push(newDistance);
+            }
+
+            // Populate the distance array of the new cluster
+            for (var i = 0; i < distanceMatrix[distanceMatrix.length - 1].length; i++) {
+                // Skip the ones that will be removed
+                if (i == nextCluster.cluster1 || i == nextCluster.cluster2) continue;
+
+                // Determine the distance between this cluster and our new cluster by using max d[c1, this], d[c2, this]
+                var newDistance = Math.max(distanceMatrix[nextCluster.cluster1][i], distanceMatrix[nextCluster.cluster2][i]);
+                distanceMatrix[distanceMatrix.length - 1][i] = newDistance;
+            }
+
+            // Set the distance between the cluster to itself to 0
+            distanceMatrix[distanceMatrix.length - 1][distanceMatrix.length - 1] = 0;
+
+            // Delete the old rows and columns
+            // Ensure we get the delete ordering right
+            var deleteFirst = Math.min(nextCluster.cluster1, nextCluster.cluster2);
+            var deleteLast = Math.max(nextCluster.cluster1, nextCluster.cluster2);
+            distanceMatrix.splice(deleteFirst, 1);
+            distanceMatrix.splice(deleteLast - 1, 1);
+
+            for (var i = 0; i < distanceMatrix.length; i++) {
+                distanceMatrix[i].splice(deleteFirst, 1);
+                distanceMatrix[i].splice(deleteLast - 1, 1);
+            }
+
+            // Delete the old clusters and add the new one to our clusters array
+            this.Clusters[zoomLevel].push(MergeClusters(this.Clusters[zoomLevel][nextCluster.cluster1], this.Clusters[zoomLevel][nextCluster.cluster2]));
+            this.Clusters[zoomLevel].splice(deleteFirst, 1);
+            this.Clusters[zoomLevel].splice(deleteLast - 1, 1);
         }
 
-        // Populate the distance array of the new cluster
-        for (var i = 0; i < newDistanceMatrix[newDistanceMatrix.length - 1].length; i++) {
-            // Skip the ones that will be removed
-            if (i == nextCluster.cluster1 || i == nextCluster.cluster2) continue;
-
-            // Determine the distance between this cluster and our new cluster by using max d[c1, this], d[c2, this]
-            var newDistance = Math.max(newDistanceMatrix[nextCluster.cluster1][i], newDistanceMatrix[nextCluster.cluster2][i]);
-            newDistanceMatrix[newDistanceMatrix.length - 1][i] = newDistance;
+        // As long as we aren't processing the minimum zoom level, we need to copy the clusters array into the next level to be processed
+        if (zoomLevel != this.MINZOOMLEVEL) {
+            this.Clusters[zoomLevel - 1] = this.CopyClusterArray(this.Clusters[zoomLevel]);
         }
 
-        // Set the distance between the cluster to itself to 0
-        newDistanceMatrix[newDistanceMatrix.length - 1][newDistanceMatrix.length - 1] = 0;
-
-        // Delete the old rows and columns
-        // Ensure we get the delete ordering right
-        var deleteFirst = Math.min(nextCluster.cluster1, nextCluster.cluster2);
-        var deleteLast = Math.max(nextCluster.cluster1, nextCluster.cluster2);
-        newDistanceMatrix.splice(deleteFirst, 1);
-        newDistanceMatrix.splice(deleteLast - 1, 1);
-
-        for (var i = 0; i < newDistanceMatrix.length; i++) {
-            newDistanceMatrix[i].splice(deleteFirst, 1);
-            newDistanceMatrix[i].splice(deleteLast - 1, 1);
-        }
-
-        // Delete the old clusters and add the new one to our clusters array
-        clusters.push(MergeClusters(clusters[nextCluster.cluster1], clusters[nextCluster.cluster2]));
-        clusters.splice(deleteFirst, 1);
-        clusters.splice(deleteLast - 1, 1);
+        // Recurse
+        this.Cluster(zoomLevel - 1, distanceMatrix);
     }
-
-    this.Clusters = clusters;
+    // Base case
+    else {
+        // We are done!
+    }
 }
 
 // Variables
@@ -265,6 +300,14 @@ Cluster.prototype.GetLongitude = function () {
     return longAgg;
 }
 
+Cluster.prototype.Clone = function () {
+    var copy = new Cluster();
+
+    copy.AddPhotos(this.Photos);
+
+    return copy;
+}
+
 function MergeClusters(cluster1, cluster2) {
     var newCluster = new Cluster();
 
@@ -276,8 +319,7 @@ function MergeClusters(cluster1, cluster2) {
 
 //TODO: Move this function
 // Returns the (approximate) distance in meters per centimeter of map
-function GetClusterThreshold() {
-    var zoomLevel = map.zoom;
+function GetClusterThreshold(zoomLevel) {
     var mapScale = 591657550.500000 / Math.pow(2, (zoomLevel - 1));
     return (mapScale / 100.0) / 2.0;
 }
