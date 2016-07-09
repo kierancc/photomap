@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test Map</title>
+    <title>Photo Map</title>
     <style>
         html, body {
             height: 100%;

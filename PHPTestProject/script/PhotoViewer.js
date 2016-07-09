@@ -9,6 +9,10 @@ function PhotoViewer(type, photos) {
     this.SetupViewer();
 }
 
+PhotoViewer.prototype.GetType = function () {
+    return this.type;
+}
+
 PhotoViewer.prototype.SetupViewer = function () {
     // Delete any old viewer control
     $('#photodiv').empty();
@@ -100,6 +104,11 @@ PhotoViewer.prototype.SetupViewer = function () {
     }
 }
 
+PhotoViewer.prototype.ShowPrevNextButtons = function () {
+    $('#PhotoViewerPrevButton').fadeTo(100, 1);
+    $('#PhotoViewerNextButton').fadeTo(100, 1);
+}
+
 PhotoViewer.prototype.HidePrevNextButtons = function () {
     $('#PhotoViewerPrevButton').fadeTo(100, 0);
     $('#PhotoViewerNextButton').fadeTo(100, 0);
@@ -123,12 +132,26 @@ PhotoViewer.prototype.LoadFirstPhoto = function () {
         $(controlDiv).empty().append(photo);
 
         photoManager.PhotoViewer.images.push(photo);
+
+        // If this viewer is for a cluster, first show the prev/next buttons and then set a timer to fade out the prev/next buttons after a few seconds
+        if (photoManager.PhotoViewer.GetType() === PhotoViewer.Type.CLUSTER) {
+            photoManager.PhotoViewer.ShowPrevNextButtons();
+            window.setTimeout(function () {
+                if (photoManager.PhotoViewer !== null)
+                    photoManager.PhotoViewer.HidePrevNextButtons();
+            }, 3000);
+
+            // Special case: Load the next photo in the sequence.  We need to prevent a race condition when loading photos to ensure the order is preserved
+            // so we will wait to load the second photo until the first has been loaded.  Since the subsequent photos are loaded one by one as the user clicks
+            // through them, we only need to take care here
+            photoManager.PhotoViewer.LoadNextPhoto();
+        }
     }
     photo.onerror = function () {
         $(controlDiv).empty().html('Photo failed to load');
     }
 
-    $(controlDiv).empty().html('Loading photo...');
+    $(controlDiv).empty().html('<img src=\"../images/loader.gif\">');
 }
 
 PhotoViewer.prototype.LoadNextPhoto = function () {
@@ -151,10 +174,6 @@ PhotoViewer.prototype.LoadNextPhoto = function () {
 PhotoViewer.Type = { SINGLE: 1, CLUSTER: 2 }
 
 PhotoViewer.prototype.ShowPhoto = function (animate) {
-    if (this.type === PhotoViewer.Type.CLUSTER) {
-        this.LoadNextPhoto(); // Preload the next photo
-    }
-
     // Show the parent div
     if (animate) {
         $('#photodiv').fadeIn(1500);
@@ -163,18 +182,10 @@ PhotoViewer.prototype.ShowPhoto = function (animate) {
     else {
         $('#photodiv').show();
     }
-
-    // If this viewer is for a cluster, set a timer to fade out the prev/next buttons after a few seconds
-    if (this.type === PhotoViewer.Type.CLUSTER) {
-        window.setTimeout(function () {
-            if (photoManager.PhotoViewer !== null)
-            photoManager.PhotoViewer.HidePrevNextButtons();
-        }, 3000);
-    }
 }
 
 PhotoViewer.prototype.ShowNextPhoto = function () {
-    if (this.index + 1 < this.photos.length) {
+    if ((this.index + 1 < this.photos.length) && (this.images[this.index + 1] !== undefined)) {
         this.index++;
 
         $('#PhotoViewerTitleCell').empty().text(this.index + 1 + " / " + this.photos.length);

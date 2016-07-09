@@ -34,11 +34,13 @@
   <ItemGroup>
     <Folder Include="config\" />
     <Folder Include="dataaccess\" />
+    <Folder Include="images\" />
     <Folder Include="style\" />
     <Folder Include="script\" />
     <Folder Include="script\jquery\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="images\loader.gif" />
     <Content Include="script\jquery\jquery-3.0.0.js" />
     <Content Include="script\jquery\jquery-ui.js" />
     <Content Include="script\Photo.js" />
