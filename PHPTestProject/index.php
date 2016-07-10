@@ -78,6 +78,6 @@
 
     </script>
     <div id="modalpane"></div>
-    <div id="photodiv"></div>
+    <div id="photodiv" tabindex="1"></div>
 </body>
 </html>

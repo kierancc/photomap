@@ -101,6 +101,21 @@ PhotoViewer.prototype.SetupViewer = function () {
                 $(this).fadeTo(150, 0);
         })
         $(containerDiv).append(nextButton);
+
+        // Wire up keyboard event listener for left and right arrow keys
+        $('#photodiv').keydown(function (event) {
+            if (event.which == 37 || event.which == 39) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                
+                if (event.which == 37) {
+                    photoManager.PhotoViewer.ShowPrevPhoto();
+                }
+                else if (event.which == 39) {
+                    photoManager.PhotoViewer.ShowNextPhoto();
+                }
+            }
+        });
     }
 }
 
@@ -176,11 +191,16 @@ PhotoViewer.Type = { SINGLE: 1, CLUSTER: 2 }
 PhotoViewer.prototype.ShowPhoto = function (animate) {
     // Show the parent div
     if (animate) {
-        $('#photodiv').fadeIn(1500);
+        $('#photodiv').fadeIn(1500, function () {
+            // Set focus on the photo viewer
+            $('#photodiv').focus();
+        });
         $('#modalpane').show().fadeIn(1500);
     }
     else {
         $('#photodiv').show();
+        // Set focus on the photo viewer
+        $('#photodiv').focus();
     }
 }
 
@@ -215,8 +235,13 @@ PhotoViewer.prototype.ShowPrevPhoto = function () {
 }
 
 PhotoViewer.prototype.ClosePhoto = function () {
-    $('#photodiv').fadeOut(1500);
+    $('#photodiv').fadeOut(1500, function () {
+        $('#photodiv').empty();
+    });
     $('#modalpane').fadeOut(1500);
-    $('#photodiv').empty();
+    
     photoManager.PhotoViewer = null;
+
+    // Unwire keyboard event listener
+    $('#photodiv').off("keydown");
 }
