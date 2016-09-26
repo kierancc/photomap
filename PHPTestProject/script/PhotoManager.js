@@ -10,7 +10,7 @@ PhotoManager.prototype.LoadPhotos = function () {
     var context = this;
     return $.getJSON('../dataaccess/getphotos.php', function (data) {
         $.each(data, function (key, val) {
-            context.Photos.push(new Photo(val.filename, parseFloat(val.latitude), parseFloat(val.longitude)));
+            context.Photos.push(new Photo(val.filename, parseFloat(val.latitude), parseFloat(val.longitude), val.locationstring));
         });
     });
 }

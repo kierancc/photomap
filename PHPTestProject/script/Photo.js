@@ -1,7 +1,8 @@
-﻿function Photo(filename, latitude, longitude) {
+﻿function Photo(filename, latitude, longitude, locationString) {
     this.fileName = filename;
     this.latitude = latitude;
     this.longitude = longitude;
+    this.locationString = locationString;
 }
 
 Photo.prototype.GetFilename = function () {
@@ -14,4 +15,8 @@ Photo.prototype.GetLatitude = function () {
 
 Photo.prototype.GetLongitude = function () {
     return this.longitude;
+}
+
+Photo.prototype.GetLocationString = function () {
+    return this.locationString;
 }
