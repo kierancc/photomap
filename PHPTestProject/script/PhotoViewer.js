@@ -105,9 +105,9 @@ PhotoViewer.prototype.SetupViewer = function () {
         })
         $(containerDiv).append(nextButton);
 
-        // Wire up keyboard event listener for left and right arrow keys
+        // Wire up keyboard event listener for left and right arrow keys and the escape key
         $('#photodiv').keydown(function (event) {
-            if (event.which == 37 || event.which == 39) {
+            if (event.which == 37 || event.which == 39|| event.which == 27) {
                 event.preventDefault();
                 event.stopImmediatePropagation();
                 
@@ -116,6 +116,9 @@ PhotoViewer.prototype.SetupViewer = function () {
                 }
                 else if (event.which == 39) {
                     photoManager.PhotoViewer.ShowNextPhoto();
+                }
+                else if (event.which == 27) {
+                    photoManager.PhotoViewer.ClosePhoto();
                 }
             }
         });
