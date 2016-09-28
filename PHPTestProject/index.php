@@ -51,7 +51,8 @@
                 center: { lat: 43.6775533333333, lng: 4.62713833333333 },
                 zoom: 3,
                 scaleControl: true,
-                minZoom: 3
+                minZoom: 3,
+                streetViewControl: false
             });
 
             map.addListener('zoom_changed', function () {
