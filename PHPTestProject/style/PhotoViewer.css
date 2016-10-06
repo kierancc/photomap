@@ -12,13 +12,20 @@
 }
 
 .PhotoViewerToolbar {
-    height: 25px;
     width: 100%;
     background: -ms-linear-gradient(top, rgba(115,187,223,1) 0%,rgba(23,86,127,1) 100%);
     background: -webkit-linear-gradient(top, rgba(115,187,223,1) 0%,rgba(23,86,127,1) 100%);
     box-shadow: inset 0 -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
                 inset 0 1px 1px rgba(255,255,255,1); /*top internal highlight*/
+}
+
+.PhotoViewerTopToolbar {
+    height: 25px;
     cursor: pointer;
+}
+
+.PhotoViewerBottomToolbar {
+    height: 50px;
 }
 
 .PhotoViewerToolbarLink {
@@ -29,6 +36,29 @@
 
 .PhotoViewerToolbarTable {
     width: 100%;
+}
+
+#PhotoViewerTitleCell {
+    width: 34%;
+    text-align: center;
+    font-weight: bolder;
+}
+
+#PhotoViewerNameCell {
+    width: 50%;
+    text-align: left;
+    font-weight: bolder;
+}
+
+#PhotoViewerLocationCell {
+    width: 50%;
+    text-align: left;
+    font-weight: bolder;
+}
+
+#PhotoViewerTagsCell {
+    text-align: left;
+    font-weight: bolder;
 }
 
 #PhotoViewerPrevButton {

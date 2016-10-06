@@ -26,7 +26,8 @@ PhotoViewer.prototype.SetupViewer = function () {
     // Create the "toolbar" div
     var toolbarDiv = document.createElement('div');
     toolbarDiv.id = "PhotoViewerToolbar";
-    toolbarDiv.className = "PhotoViewerToolbar";
+    toolbarDiv.classList.add("PhotoViewerToolbar");
+    toolbarDiv.classList.add("PhotoViewerTopToolbar");
     var toolbarTable = document.createElement('table');
     toolbarTable.className = "PhotoViewerToolbarTable";
     var toolbarTableRow = document.createElement('tr');
@@ -39,9 +40,6 @@ PhotoViewer.prototype.SetupViewer = function () {
     // Second cell has the current photo number and count
     var toolbarTableTitleCell = document.createElement('td');
     toolbarTableTitleCell.id = "PhotoViewerTitleCell";
-    toolbarTableTitleCell.style.width = "34%";
-    toolbarTableTitleCell.style.textAlign = "center";
-    toolbarTableTitleCell.style.fontWeight = "bolder";
     toolbarTableTitleCell.innerText = this.index + 1 + " / " + this.photos.length;
     toolbarTableRow.appendChild(toolbarTableTitleCell);
     
@@ -133,7 +131,8 @@ PhotoViewer.prototype.SetupViewer = function () {
         // Create the bottom toolbar div
         var bottomToolbarDiv = document.createElement('div');
         bottomToolbarDiv.id = "PhotoViewerBottomToolbar";
-        bottomToolbarDiv.className = "PhotoViewerToolbar";
+        bottomToolbarDiv.classList.add("PhotoViewerToolbar");
+        bottomToolbarDiv.classList.add("PhotoViewerBottomToolbar");
         var bottomToolbarTable = document.createElement('table');
         bottomToolbarTable.className = "PhotoViewerToolbarTable";
         var bottomToolbarTableRow = document.createElement('tr');
@@ -141,23 +140,33 @@ PhotoViewer.prototype.SetupViewer = function () {
         // Add the first cell, this will contain the file name of the photo
         var bottomToolbarTableNameCell = document.createElement('td');
         bottomToolbarTableNameCell.id = "PhotoViewerNameCell";
-        bottomToolbarTableNameCell.style.width = "50%";
-        bottomToolbarTableNameCell.style.textAlign = "left";
-        bottomToolbarTableNameCell.style.fontWeight = "bolder";
         bottomToolbarTableNameCell.innerText = "Name: " + this.photos[this.index].GetFilename();
         bottomToolbarTableRow.appendChild(bottomToolbarTableNameCell);
 
         // Add the second cell, this will contain the location of the photo (if it has been specified)
         var bottomToolbarTableLocationCell = document.createElement('td');
         bottomToolbarTableLocationCell.id = "PhotoViewerLocationCell";
-        bottomToolbarTableLocationCell.style.width = "50%";
-        bottomToolbarTableLocationCell.style.textAlign = "right";
-        bottomToolbarTableLocationCell.style.fontWeight = "bolder";
         bottomToolbarTableLocationCell.innerText = "Location: " + this.photos[this.index].GetLocationString();
         bottomToolbarTableRow.appendChild(bottomToolbarTableLocationCell);
 
         bottomToolbarTable.appendChild(bottomToolbarTableRow);
+
+        // Add the table
         bottomToolbarDiv.appendChild(bottomToolbarTable);
+
+        // Add the second table (for tags)
+        var bottomToolbarTable2 = document.createElement('table');
+        bottomToolbarTable2.className = "PhotoViewerToolbarTable";
+        var bottomToolbarTableRow2 = document.createElement('tr');
+        var bottomToolbarTableTagsCell = document.createElement('td');
+        bottomToolbarTableTagsCell.id = "PhotoViewerTagsCell";
+        bottomToolbarTableTagsCell.innerText = "Tags: " + this.photos[this.index].GetTagsString();
+        bottomToolbarTableRow2.appendChild(bottomToolbarTableTagsCell);
+
+        bottomToolbarTable2.appendChild(bottomToolbarTableRow2);
+        // Add the table
+        bottomToolbarDiv.appendChild(bottomToolbarTable2);
+        
 
         $(containerDiv).append($(bottomToolbarDiv));
     }
@@ -248,6 +257,7 @@ PhotoViewer.prototype.ShowNextPhoto = function () {
         $('#PhotoViewerTitleCell').empty().text(this.index + 1 + " / " + this.photos.length);
         $('#PhotoViewerNameCell').empty().text("Name: " + this.photos[this.index].GetFilename());
         $('#PhotoViewerLocationCell').empty().text("Location: " + this.photos[this.index].GetLocationString());
+        $('#PhotoViewerTagsCell').empty().text("Tags: " + this.photos[this.index].GetTagsString());
 
         $('#PhotoViewer').hide();
         $('#PhotoViewer').empty();
@@ -267,6 +277,7 @@ PhotoViewer.prototype.ShowPrevPhoto = function () {
         $('#PhotoViewerTitleCell').empty().text(this.index + 1 + " / " + this.photos.length);
         $('#PhotoViewerNameCell').empty().text("Name: " + this.photos[this.index].GetFilename());
         $('#PhotoViewerLocationCell').empty().text("Location: " + this.photos[this.index].GetLocationString());
+        $('#PhotoViewerTagsCell').empty().text("Tags: " + this.photos[this.index].GetTagsString());
 
         $('#PhotoViewer').hide();
         $('#PhotoViewer').empty();
