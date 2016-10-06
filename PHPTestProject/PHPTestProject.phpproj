@@ -46,6 +46,7 @@
     <Content Include="script\Photo.js" />
     <Content Include="script\PhotoManager.js" />
     <Content Include="script\PhotoViewer.js" />
+    <Content Include="script\TagManager.js" />
     <Content Include="style\PhotoViewer.css" />
   </ItemGroup>
 </Project>

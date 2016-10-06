@@ -10,6 +10,10 @@ $photos = array();
 
 if(mysql_num_rows($result)) {
 	while($photo = mysql_fetch_assoc($result)) {
+
+        // Clean any invalid characters from the location string
+        // TODO: Figure out why we sometimes get invalid characters here
+        $photo["locationstring"] = iconv('ASCII', 'UTF-8//IGNORE', $photo["locationstring"]);
         array_push($photos, $photo);
 	}
 }
