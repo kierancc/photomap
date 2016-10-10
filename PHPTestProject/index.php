@@ -33,7 +33,9 @@
             display: none;
         }
     </style>
+    <link rel="stylesheet" href="style/MenuControl.css" />
     <link rel="stylesheet" href="style/PhotoViewer.css" />
+    <script src="script/MenuControl.js"></script>
     <script src="script/Photo.js"></script>
     <script src="script/PhotoManager.js"></script>
     <script src="script/PhotoViewer.js"></script>
@@ -71,6 +73,10 @@
                     photoManager.SetupForCluster();
                     photoManager.DoCluster();
                     photoManager.CreateMarkers();
+
+                    var menuControl = new MenuControl();
+                    menuControl.index = 1;
+                    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(menuControl);
                 })
                 .fail(function() {
                     alert('Failed to load photos!');

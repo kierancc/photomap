@@ -43,10 +43,12 @@
     <Content Include="images\loader.gif" />
     <Content Include="script\jquery\jquery-3.0.0.js" />
     <Content Include="script\jquery\jquery-ui.js" />
+    <Content Include="script\MenuControl.js" />
     <Content Include="script\Photo.js" />
     <Content Include="script\PhotoManager.js" />
     <Content Include="script\PhotoViewer.js" />
     <Content Include="script\TagManager.js" />
+    <Content Include="style\MenuControl.css" />
     <Content Include="style\PhotoViewer.css" />
   </ItemGroup>
 </Project>
