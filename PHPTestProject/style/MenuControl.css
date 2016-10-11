@@ -5,8 +5,8 @@
 
 .MenuControlExpandButton {
     position: absolute;
-    width: 75px;
-    height: 75px;
+    width: 50px;
+    height: 50px;
     background-color: aliceblue;
     color: darkblue;
     top: 10px;
@@ -14,8 +14,9 @@
     text-align: center;
     font-size: xx-large;
     font-weight: bolder;
-    line-height: 75px;
+    line-height: 50px;
     z-index: 2;
+    cursor: pointer;
 }
 
 .MenuControlExpandedMenu {
@@ -27,4 +28,32 @@
     z-index: 1;
     top: 0px;
     right:0px;
+    overflow-y: scroll;
+}
+
+.MenuControlTagListContainer {
+    position: absolute;
+    width: 100%;
+    top: 100px;
+    height: auto;
+}
+
+.MenuControlTagListItem {
+    height: 25px;
+    width: 80%;
+    background-color: lightblue;
+    color: blue;
+    margin: auto;
+}
+
+.MenuControlTagListTable {
+    width: 100%;
+}
+
+.MenuControlTagListTableLeftCell {
+    text-align: left;
+}
+
+.MenuControlTagListTableRightCell {
+    text-align: right;
 }

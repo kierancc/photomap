@@ -30,5 +30,40 @@ function MenuControl() {
 
     containerDiv.appendChild(expandButton);
 
+    // Process the photo tags
+    var tagsAndCounts = tagManager.GetTagAndPhotoCountSorted();
+
+    // Build up the tag list
+    var tagListContainerDiv = document.createElement('div');
+    tagListContainerDiv.classList.add("MenuControlTagListContainer");
+    menuDiv.appendChild(tagListContainerDiv);
+
+    // Add tags to the list
+    for (var i = 0; i < tagsAndCounts.length; i++) {
+        var listElement = document.createElement('div');
+        listElement.classList.add("MenuControlTagListItem");
+        listElement.id = "TagListItem" + tagsAndCounts[i].GetTag();
+        
+        // Build up a table for the contents
+        var table = document.createElement('table');
+        table.classList.add("MenuControlTagListTable");
+
+        var tableRow = document.createElement('tr');
+        var tableCell1 = document.createElement('td');
+        tableCell1.classList.add("MenuControlTagListTableLeftCell");
+        tableCell1.innerText = tagsAndCounts[i].GetTag();
+
+        var tableCell2 = document.createElement('td');
+        tableCell2.classList.add("MenuControlTagListTableRightCell");
+        tableCell2.innerText = tagsAndCounts[i].GetCount();
+
+        tableRow.appendChild(tableCell1);
+        tableRow.appendChild(tableCell2);
+        table.appendChild(tableRow)
+        listElement.appendChild(table);
+
+        tagListContainerDiv.appendChild(listElement);
+    }
+
     return containerDiv;
 }
