@@ -42,6 +42,7 @@ function MenuControl() {
     for (var i = 0; i < tagsAndCounts.length; i++) {
         var listElement = document.createElement('div');
         listElement.classList.add("MenuControlTagListItem");
+        listElement.classList.add("MenuControlTagListItemEnabled");
         listElement.id = "TagListItem" + tagsAndCounts[i].GetTag();
         
         // Build up a table for the contents
@@ -57,6 +58,12 @@ function MenuControl() {
         tableCell2.classList.add("MenuControlTagListTableRightCell");
         tableCell2.innerText = tagsAndCounts[i].GetCount();
 
+        // Wire up click
+        $(listElement).click(this.TagListItemClicked);
+
+        // Store the tag in the div for future use
+        $(listElement).data("tagName", tagsAndCounts[i].GetTag());
+
         tableRow.appendChild(tableCell1);
         tableRow.appendChild(tableCell2);
         table.appendChild(tableRow)
@@ -66,4 +73,15 @@ function MenuControl() {
     }
 
     return containerDiv;
+}
+
+MenuControl.prototype.TagListItemClicked = function () {
+    if ($(this).hasClass("MenuControlTagListItemEnabled")) {
+        $(this).removeClass("MenuControlTagListItemEnabled");
+        $(this).addClass("MenuControlTagListItemDisabled");
+    }
+    else {
+        $(this).removeClass("MenuControlTagListItemDisabled");
+        $(this).addClass("MenuControlTagListItemEnabled");
+    }
 }

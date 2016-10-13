@@ -41,9 +41,19 @@
 .MenuControlTagListItem {
     height: 25px;
     width: 80%;
-    background-color: lightblue;
     color: blue;
     margin: auto;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.MenuControlTagListItemEnabled {
+    background-color: lightblue;
+}
+
+.MenuControlTagListItemDisabled {
+    border-color: lightblue;
+    border: thick;
 }
 
 .MenuControlTagListTable {
