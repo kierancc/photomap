@@ -1,6 +1,5 @@
 ﻿.MenuControlContainer {
     position: absolute;
-    height: 100%;
 }
 
 .MenuControlExpandButton {
@@ -19,23 +18,25 @@
     cursor: pointer;
 }
 
+.MenuControlExpandedMenuHeader {
+    height: 100px;
+    width: 100%;
+    background-color: slategray;
+}
+
 .MenuControlExpandedMenu {
-    position: absolute;
     width: 200px;
     background-color: slategray;
-    height: 100%;
-    max-height: 75vh;
     z-index: 1;
     top: 0px;
     right:0px;
-    overflow-y: scroll;
 }
 
 .MenuControlTagListContainer {
-    position: absolute;
     width: 100%;
-    top: 100px;
     height: auto;
+    overflow-y: auto;
+    max-height: 70vh;
 }
 
 .MenuControlTagListItem {

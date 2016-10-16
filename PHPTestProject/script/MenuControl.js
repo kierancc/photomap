@@ -10,6 +10,11 @@ function MenuControl() {
     $(menuDiv).hide();
     containerDiv.appendChild(menuDiv);
 
+    // Add the header to the menu
+    var menuHeaderDiv = document.createElement('div');
+    menuHeaderDiv.classList.add('MenuControlExpandedMenuHeader');
+    menuDiv.appendChild(menuHeaderDiv);
+
     // Declare the button for expanding/hiding the menu
     var expandButton = document.createElement('div');
     expandButton.classList.add('MenuControlExpandButton');
