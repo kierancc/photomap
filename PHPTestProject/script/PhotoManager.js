@@ -120,13 +120,15 @@ PhotoManager.prototype.CalculatePhotoDistances = function () {
 
 // Clustering Functions
 PhotoManager.prototype.CopyDistanceMatrix = function () {
-    var newDistanceMatrix = new Array(this.PhotoDistances.length);
+    var newDistanceMatrix = [];
 
-    for (var i = 0; i < newDistanceMatrix.length; i++) {
-        newDistanceMatrix[i] = new Array(this.PhotoDistances.length);
+    for (var i = 0; i < this.PhotoDistances.length; i++) {
+        if (!this.Photos[i].IsVisible()) continue;
+        newDistanceMatrix.push([]);
 
-        for (var j = 0; j < newDistanceMatrix[i].length; j++) {
-            newDistanceMatrix[i][j] = this.PhotoDistances[i][j];
+        for (var j = 0; j < this.PhotoDistances.length; j++) {
+            if (!this.Photos[j].IsVisible()) continue;
+            newDistanceMatrix[newDistanceMatrix.length-1].push(this.PhotoDistances[i][j]);
         }
     }
 
@@ -171,9 +173,11 @@ PhotoManager.prototype.SetupForCluster = function () {
         this.Clusters[i] = new Array();
     }
 
-    // Initially populate the highest zoom level with each photo as its own cluster
+    // Initially populate the highest zoom level with each photo as its own cluster (only if the photo is visible)
     for (var i = 0; i < this.Photos.length; i++) {
-        this.Clusters[this.MAXZOOMLEVEL].push(new Cluster(this.Photos[i]));
+        if (this.Photos[i].IsVisible()) {
+            this.Clusters[this.MAXZOOMLEVEL].push(new Cluster(this.Photos[i]));
+        }
     }
 }
 
@@ -249,6 +253,26 @@ PhotoManager.prototype.Cluster = function (zoomLevel, distanceMatrix) {
     else {
         // We are done!
     }
+}
+
+PhotoManager.prototype.OnVisiblePhotosUpdated = function () {
+    // First update the status of each photo object
+    var visiblePhotoSet = tagManager.GetVisiblePhotos();
+
+    for (var i = 0; i < photoManager.Photos.length; i++) {
+        if (visiblePhotoSet.has(i)) {
+            photoManager.Photos[i].SetIsVisible(true);
+        }
+        else {
+            photoManager.Photos[i].SetIsVisible(false);
+        }
+    }
+
+    // Now recalculate the clusters and redraw the markers
+    photoManager.SetupForCluster();
+    photoManager.DoCluster();
+    photoManager.ClearAllMarkers(true);
+    photoManager.CreateMarkers();
 }
 
 // Variables

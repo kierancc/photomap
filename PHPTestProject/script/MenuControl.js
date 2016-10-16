@@ -76,12 +76,16 @@ function MenuControl() {
 }
 
 MenuControl.prototype.TagListItemClicked = function () {
+    // Disable a tag
     if ($(this).hasClass("MenuControlTagListItemEnabled")) {
         $(this).removeClass("MenuControlTagListItemEnabled");
         $(this).addClass("MenuControlTagListItemDisabled");
+        tagManager.FilterTag($(this).data("tagName"), false);
     }
+    // Enable a tag
     else {
         $(this).removeClass("MenuControlTagListItemDisabled");
         $(this).addClass("MenuControlTagListItemEnabled");
+        tagManager.FilterTag($(this).data("tagName"), true);
     }
 }

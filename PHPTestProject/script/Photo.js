@@ -4,6 +4,7 @@
     this.longitude = longitude;
     this.locationString = locationString;
     this.tagsString = tagsString;
+    this.isVisible = true; // All Photos are 'on' by default
 }
 
 Photo.prototype.GetFilename = function () {
@@ -24,4 +25,12 @@ Photo.prototype.GetLocationString = function () {
 
 Photo.prototype.GetTagsString = function () {
     return this.tagsString;
+}
+
+Photo.prototype.IsVisible = function () {
+    return this.isVisible;
+}
+
+Photo.prototype.SetIsVisible = function (visible) {
+    this.isVisible = visible;
 }

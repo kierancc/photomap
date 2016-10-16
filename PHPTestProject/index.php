@@ -81,6 +81,9 @@
                 .fail(function() {
                     alert('Failed to load photos!');
                 });
+
+            // Bind custom event handlers
+            $(document).on("TagManager:VisiblePhotosUpdated", photoManager.OnVisiblePhotosUpdated);
         });
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD1vK0IbVjCnwIH-Qjnb6deC6EDktJPrWI&callback=initMap"

@@ -1,8 +1,10 @@
 ﻿/// <reference path="jquery/jquery-3.0.0.js" />
-
+/// <reference path="util.js" />
 // TagManager Class
 function TagManager() {
     this.TagPhotoDictionary = [];
+    this.TagStatus = []; // true == enabled, false == filtered out
+    this.VisiblePhotos = new Set();
 }
 
 TagManager.prototype.RegisterPhoto = function (photo, index) {
@@ -12,6 +14,8 @@ TagManager.prototype.RegisterPhoto = function (photo, index) {
     // Iterate over the tags
     for (var i = 0; i < tags.length; i++) {
         this.TryAddTagAndPhoto(tags[i], index);
+        this.TryAddTagStatus(tags[i], true);  // Tags are always enabled by default
+        this.VisiblePhotos.add(index);
     }
 }
 
@@ -25,6 +29,15 @@ TagManager.prototype.TryAddTagAndPhoto = function (tag, index) {
 
     // Now that the tag exists in the dictionary, add the index of the current photo
     this.TagPhotoDictionary[tag].push(index);
+}
+
+TagManager.prototype.TryAddTagStatus = function (tag, status) {
+    if (undefined === this.TagStatus[tag]) {
+        this.TagStatus[tag] = status;
+    }
+    else {
+        this.TagStatus[tag] = status;
+    }
 }
 
 TagManager.prototype.ParseTagList = function (tagString) {
@@ -43,6 +56,44 @@ TagManager.prototype.GetPhotoCountForTag = function (tagName) {
     else {
         return 0;
     }
+}
+
+// Filtering functions
+TagManager.prototype.FilterTag = function (tag, status) {
+    if (undefined !== this.TagStatus[tag]) {
+        this.TagStatus[tag] = status;
+
+        // Rebuild the visible photos set
+        var oldVisiblePhotoCount = this.VisiblePhotos.size;
+        this.UpdateVisiblePhotos();
+
+        // Fire a custom event to indicated that the visible photo list was updated
+        // Only do this if the number of visible photos has increased or decreased
+        // so as to avoid costly reclustering calculations
+        if (oldVisiblePhotoCount != this.VisiblePhotos.size) {
+            $(document).trigger("TagManager:VisiblePhotosUpdated");
+        }
+    }
+}
+
+TagManager.prototype.UpdateVisiblePhotos = function () {
+    // Iterate over the enabled tags and build a set of photos to display
+    var keys = Object.keys(this.TagStatus);
+    var newSet = new Set();
+
+    for (var i = 0; i < keys.length; i++) {
+        if (this.TagStatus[keys[i]] == true) {
+            for (var j = 0; j < this.TagPhotoDictionary[keys[i]].length; j++) {
+                newSet.add(this.TagPhotoDictionary[keys[i]][j]);
+            }
+        }
+    }
+
+    this.VisiblePhotos = newSet;
+}
+
+TagManager.prototype.GetVisiblePhotos = function () {
+    return this.VisiblePhotos;
 }
 
 TagManager.prototype.GetTagAndPhotoCountSorted = function () {
