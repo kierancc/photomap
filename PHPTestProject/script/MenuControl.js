@@ -15,6 +15,45 @@ function MenuControl() {
     menuHeaderDiv.classList.add('MenuControlExpandedMenuHeader');
     menuDiv.appendChild(menuHeaderDiv);
 
+    // Add the tag selector bar to the menu
+    var tagSelectorDiv = document.createElement('div');
+    tagSelectorDiv.classList.add('MenuControlTagSelectors');
+    var tagSelectorTable = document.createElement('table');
+    tagSelectorTable.style.width = "100%";
+    var tagSelectorTableRow = document.createElement('tr');
+
+    // Build the select all link
+    var tagSelectorTableAllCell = document.createElement('td');
+    tagSelectorTableAllCell.style.textAlign = "left";
+    var tagSelectorSelectAllLink = document.createElement('span');
+    tagSelectorSelectAllLink.innerText = "Select All";
+    tagSelectorTableAllCell.appendChild(tagSelectorSelectAllLink);
+    tagSelectorTableRow.appendChild(tagSelectorTableAllCell);
+
+    $(tagSelectorSelectAllLink).click(function () {
+        tagManager.SetAllPhotosVisible();
+        $(".MenuControlTagListItemDisabled").switchClass("MenuControlTagListItemDisabled", "MenuControlTagListItemEnabled", 300);
+    });
+
+    // Build the select none link
+    var tagSelectorTableNoneCell = document.createElement('td');
+    tagSelectorTableNoneCell.style.textAlign = "right";
+    var tagSelectorSelectNoneLink = document.createElement('span');
+    tagSelectorSelectNoneLink.innerText = "Select None";
+    tagSelectorTableNoneCell.appendChild(tagSelectorSelectNoneLink);
+    tagSelectorTableRow.appendChild(tagSelectorTableNoneCell);
+
+    $(tagSelectorSelectNoneLink).click(function () {
+        tagManager.SetAllPhotosNotVisible();
+        $(".MenuControlTagListItemEnabled").switchClass("MenuControlTagListItemEnabled", "MenuControlTagListItemDisabled", 300);
+    });
+
+    // Add the table
+    tagSelectorTable.appendChild(tagSelectorTableRow);
+    tagSelectorDiv.appendChild(tagSelectorTable);
+    menuDiv.appendChild(tagSelectorDiv);
+
+
     // Declare the button for expanding/hiding the menu
     var expandButton = document.createElement('div');
     expandButton.classList.add('MenuControlExpandButton');
@@ -83,14 +122,12 @@ function MenuControl() {
 MenuControl.prototype.TagListItemClicked = function () {
     // Disable a tag
     if ($(this).hasClass("MenuControlTagListItemEnabled")) {
-        $(this).removeClass("MenuControlTagListItemEnabled");
-        $(this).addClass("MenuControlTagListItemDisabled");
+        $(this).switchClass("MenuControlTagListItemEnabled", "MenuControlTagListItemDisabled", 300);
         tagManager.FilterTag($(this).data("tagName"), false);
     }
     // Enable a tag
     else {
-        $(this).removeClass("MenuControlTagListItemDisabled");
-        $(this).addClass("MenuControlTagListItemEnabled");
+        $(this).switchClass("MenuControlTagListItemDisabled", "MenuControlTagListItemEnabled", 300);
         tagManager.FilterTag($(this).data("tagName"), true);
     }
 }

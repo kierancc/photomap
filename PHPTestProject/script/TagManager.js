@@ -76,6 +76,34 @@ TagManager.prototype.FilterTag = function (tag, status) {
     }
 }
 
+TagManager.prototype.SetAllPhotosVisible = function () {
+    this.SetAllPhotosStatus(true);
+}
+
+TagManager.prototype.SetAllPhotosNotVisible = function () {
+    this.SetAllPhotosStatus(false);
+}
+
+TagManager.prototype.SetAllPhotosStatus = function (status) {
+    var keys = Object.keys(this.TagStatus);
+    var newSet = new Set();
+
+    for (var i = 0; i < keys.length; i++) {
+        this.TagStatus[keys[i]] = status;
+    }
+
+    // Rebuild the visible photos set
+    var oldVisiblePhotoCount = this.VisiblePhotos.size;
+    this.UpdateVisiblePhotos();
+
+    // Fire a custom event to indicated that the visible photo list was updated
+    // Only do this if the number of visible photos has increased or decreased
+    // so as to avoid costly reclustering calculations
+    if (oldVisiblePhotoCount != this.VisiblePhotos.size) {
+        $(document).trigger("TagManager:VisiblePhotosUpdated");
+    }
+}
+
 TagManager.prototype.UpdateVisiblePhotos = function () {
     // Iterate over the enabled tags and build a set of photos to display
     var keys = Object.keys(this.TagStatus);
