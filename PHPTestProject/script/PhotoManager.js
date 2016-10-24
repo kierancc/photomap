@@ -24,10 +24,11 @@ PhotoManager.prototype.CreateMarkers = function () {
 
         var marker = new google.maps.Marker({
             position: position,
-            map: map,
+            map: map
         });
 
         var clusterPhotos = this.Clusters[map.zoom][i].GetPhotos();
+        marker.setIcon(this.CreateIcon(clusterPhotos.length));
 
         // Single photo case
         if (clusterPhotos.length == 1) {
@@ -61,6 +62,21 @@ PhotoManager.prototype.CreateMarkers = function () {
 
 }
 
+PhotoManager.prototype.CreateIcon = function (numPhotos) {
+    var totalVisiblePhotos = tagManager.GetVisiblePhotosCount();
+    var extraScale = (numPhotos / totalVisiblePhotos) * this.CIRCLESCALERANGE;
+    var scale = this.MINCIRCLESCALE + extraScale;
+
+    return {
+        fillColor: 'red',
+        fillOpacity: 0.5,
+        strokeColor: 'white',
+        strokeWeight: 0.5,
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: scale
+    };
+}
+
 PhotoManager.prototype.ClearAllMarkers = function (deleteMarkers) {
     for (var i = 0; i < this.Markers.length; i++) {
         this.Markers[i].setMap(null);
@@ -76,6 +92,9 @@ PhotoManager.prototype.PhotoPath = 'photos/';
 PhotoManager.prototype.R = 6371e3;
 PhotoManager.prototype.MAXZOOMLEVEL = 25;
 PhotoManager.prototype.MINZOOMLEVEL = 0;
+PhotoManager.prototype.MAXCIRCLESCALE = 24;
+PhotoManager.prototype.MINCIRCLESCALE = 8;
+PhotoManager.prototype.CIRCLESCALERANGE = 16;
 
 // Functions
 PhotoManager.prototype.GetRelativePathToPhoto = function(filename) {

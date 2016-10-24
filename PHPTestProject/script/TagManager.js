@@ -124,6 +124,10 @@ TagManager.prototype.GetVisiblePhotos = function () {
     return this.VisiblePhotos;
 }
 
+TagManager.prototype.GetVisiblePhotosCount = function () {
+    return this.VisiblePhotos.size;
+}
+
 TagManager.prototype.GetTagAndPhotoCountSorted = function () {
     var results = [];
 
