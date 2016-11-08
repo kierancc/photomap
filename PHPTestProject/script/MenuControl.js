@@ -27,6 +27,7 @@ function MenuControl() {
     tagSelectorTableAllCell.style.textAlign = "left";
     var tagSelectorSelectAllLink = document.createElement('span');
     tagSelectorSelectAllLink.innerText = "Select All";
+    tagSelectorSelectAllLink.style.cursor = "pointer";
     tagSelectorTableAllCell.appendChild(tagSelectorSelectAllLink);
     tagSelectorTableRow.appendChild(tagSelectorTableAllCell);
 
@@ -40,6 +41,7 @@ function MenuControl() {
     tagSelectorTableNoneCell.style.textAlign = "right";
     var tagSelectorSelectNoneLink = document.createElement('span');
     tagSelectorSelectNoneLink.innerText = "Select None";
+    tagSelectorSelectNoneLink.style.cursor = "pointer";
     tagSelectorTableNoneCell.appendChild(tagSelectorSelectNoneLink);
     tagSelectorTableRow.appendChild(tagSelectorTableNoneCell);
 
