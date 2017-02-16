@@ -85,7 +85,7 @@ PhotoViewer.prototype.SetupViewer = function () {
             },
             function () {
                 $(this).fadeTo(150, 0);
-        });
+            });
         $(containerDiv).append(prevButton);
 
         var nextButton = document.createElement('div');
@@ -100,7 +100,7 @@ PhotoViewer.prototype.SetupViewer = function () {
             },
             function () {
                 $(this).fadeTo(150, 0);
-        })
+            })
         $(containerDiv).append(nextButton);
 
         // Wire up keyboard event listener for left and right arrow keys and the escape key
@@ -121,55 +121,56 @@ PhotoViewer.prototype.SetupViewer = function () {
             }
         });
 
-        // Set up the photo control
-        var controlDiv = document.createElement('div');
-        controlDiv.id = "PhotoViewer";
+    }
 
-        // Add the control to the parent div
-        $(containerDiv).append($(controlDiv));
+    // Set up the photo control
+    var controlDiv = document.createElement('div');
+    controlDiv.id = "PhotoViewer";
 
-        // Create the bottom toolbar div
-        var bottomToolbarDiv = document.createElement('div');
-        bottomToolbarDiv.id = "PhotoViewerBottomToolbar";
-        bottomToolbarDiv.classList.add("PhotoViewerToolbar");
-        bottomToolbarDiv.classList.add("PhotoViewerBottomToolbar");
-        var bottomToolbarTable = document.createElement('table');
-        bottomToolbarTable.className = "PhotoViewerToolbarTable";
-        var bottomToolbarTableRow = document.createElement('tr');
+    // Add the control to the parent div
+    $(containerDiv).append($(controlDiv));
 
-        // Add the first cell, this will contain the file name of the photo
-        var bottomToolbarTableNameCell = document.createElement('td');
-        bottomToolbarTableNameCell.id = "PhotoViewerNameCell";
-        bottomToolbarTableNameCell.innerText = "Name: " + this.photos[this.index].GetFilename();
-        bottomToolbarTableRow.appendChild(bottomToolbarTableNameCell);
+    // Create the bottom toolbar div
+    var bottomToolbarDiv = document.createElement('div');
+    bottomToolbarDiv.id = "PhotoViewerBottomToolbar";
+    bottomToolbarDiv.classList.add("PhotoViewerToolbar");
+    bottomToolbarDiv.classList.add("PhotoViewerBottomToolbar");
+    var bottomToolbarTable = document.createElement('table');
+    bottomToolbarTable.className = "PhotoViewerToolbarTable";
+    var bottomToolbarTableRow = document.createElement('tr');
 
-        // Add the second cell, this will contain the location of the photo (if it has been specified)
-        var bottomToolbarTableLocationCell = document.createElement('td');
-        bottomToolbarTableLocationCell.id = "PhotoViewerLocationCell";
-        bottomToolbarTableLocationCell.innerText = "Location: " + this.photos[this.index].GetLocationString();
-        bottomToolbarTableRow.appendChild(bottomToolbarTableLocationCell);
+    // Add the first cell, this will contain the file name of the photo
+    var bottomToolbarTableNameCell = document.createElement('td');
+    bottomToolbarTableNameCell.id = "PhotoViewerNameCell";
+    bottomToolbarTableNameCell.innerText = "Name: " + this.photos[this.index].GetFilename();
+    bottomToolbarTableRow.appendChild(bottomToolbarTableNameCell);
 
-        bottomToolbarTable.appendChild(bottomToolbarTableRow);
+    // Add the second cell, this will contain the location of the photo (if it has been specified)
+    var bottomToolbarTableLocationCell = document.createElement('td');
+    bottomToolbarTableLocationCell.id = "PhotoViewerLocationCell";
+    bottomToolbarTableLocationCell.innerText = "Location: " + this.photos[this.index].GetLocationString();
+    bottomToolbarTableRow.appendChild(bottomToolbarTableLocationCell);
 
-        // Add the table
-        bottomToolbarDiv.appendChild(bottomToolbarTable);
+    bottomToolbarTable.appendChild(bottomToolbarTableRow);
 
-        // Add the second table (for tags)
-        var bottomToolbarTable2 = document.createElement('table');
-        bottomToolbarTable2.className = "PhotoViewerToolbarTable";
-        var bottomToolbarTableRow2 = document.createElement('tr');
-        var bottomToolbarTableTagsCell = document.createElement('td');
-        bottomToolbarTableTagsCell.id = "PhotoViewerTagsCell";
-        bottomToolbarTableTagsCell.innerText = "Tags: " + this.photos[this.index].GetTagsString();
-        bottomToolbarTableRow2.appendChild(bottomToolbarTableTagsCell);
+    // Add the table
+    bottomToolbarDiv.appendChild(bottomToolbarTable);
 
-        bottomToolbarTable2.appendChild(bottomToolbarTableRow2);
-        // Add the table
-        bottomToolbarDiv.appendChild(bottomToolbarTable2);
+    // Add the second table (for tags)
+    var bottomToolbarTable2 = document.createElement('table');
+    bottomToolbarTable2.className = "PhotoViewerToolbarTable";
+    var bottomToolbarTableRow2 = document.createElement('tr');
+    var bottomToolbarTableTagsCell = document.createElement('td');
+    bottomToolbarTableTagsCell.id = "PhotoViewerTagsCell";
+    bottomToolbarTableTagsCell.innerText = "Tags: " + this.photos[this.index].GetTagsString();
+    bottomToolbarTableRow2.appendChild(bottomToolbarTableTagsCell);
+
+    bottomToolbarTable2.appendChild(bottomToolbarTableRow2);
+    // Add the table
+    bottomToolbarDiv.appendChild(bottomToolbarTable2);
         
 
-        $(containerDiv).append($(bottomToolbarDiv));
-    }
+    $(containerDiv).append($(bottomToolbarDiv));
 }
 
 PhotoViewer.prototype.ShowPrevNextButtons = function () {
