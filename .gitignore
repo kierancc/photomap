@@ -250,3 +250,4 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/PHPTestProject/config/database_write.php

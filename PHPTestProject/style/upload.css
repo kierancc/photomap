@@ -1,0 +1,115 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    background-color: dimgrey;
+}
+
+#photoholder {
+    position: relative;
+    margin-top: 10vh;
+    margin-left: auto;
+    margin-right: auto;
+    width: 40vw;  
+    height: 40vh;
+    border: dashed;
+    border-color: black;
+    border-radius: 10px;
+    background-color: lightgrey;
+}
+
+#photodetails {
+    display: none;
+    position: relative;
+    margin-top: 25px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 40vw;
+    max-width: 40vw;
+    background-color: lightgrey;
+    border-radius: 10px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+#photoholder p {
+    color: dimgrey;
+    font-family: Cambria;
+    font-size: x-large;
+}
+
+#photoholder img {
+    max-width: 40vw;
+    max-height: 40vh;
+}
+
+.centered {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.textbox {
+    height: 40px;
+    width: 80%;
+    font-family: Cambria;
+    margin-left: 10%;
+    margin-right: 10%;
+}
+
+#locationbar {
+    position: relative;
+    height: 40px;
+    width: 80%;
+    margin-left: 10%;
+    margin-right: 10%;
+    display: flex;
+}
+
+#locationstring {
+    height: 40px;
+    font-family: Cambria;
+    width: 100%;
+}
+
+#locationbutton {
+    height: 46px;
+    width: 46px;
+    background-color: dodgerblue;
+}
+
+#buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+
+#mapholder {
+    display: none;
+    position: absolute;
+    width: 60vw;
+    height: 60vh;
+    top: 20vh;
+    left: 20vw;
+}
+
+#maptoolbar {
+    height: 25px;
+    width: 100%;
+    background-color: azure;
+    color: dimgrey;
+    text-align: right;
+}
+
+#maptoolbarclose {
+    font-size: x-large;
+    cursor: pointer;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+}

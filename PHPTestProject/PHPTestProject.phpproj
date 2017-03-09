@@ -17,7 +17,7 @@
     <PHPDevAutoPort>true</PHPDevAutoPort>
     <CustomXdebugPort>9000</CustomXdebugPort>
     <PublishEvent>None</PublishEvent>
-    <SpecificPageValue>index.php</SpecificPageValue>
+    <SpecificPageValue>upload.php</SpecificPageValue>
     <StartAction>SpecificPage</StartAction>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -28,8 +28,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="config\database.php" />
+    <Compile Include="config\database_write.php" />
     <Compile Include="dataaccess\getphotos.php" />
+    <Compile Include="dataaccess\uploadphoto.php" />
     <Compile Include="index.php" />
+    <Compile Include="upload.php" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="config\" />
@@ -48,7 +51,9 @@
     <Content Include="script\PhotoManager.js" />
     <Content Include="script\PhotoViewer.js" />
     <Content Include="script\TagManager.js" />
+    <Content Include="script\upload.js" />
     <Content Include="style\MenuControl.css" />
     <Content Include="style\PhotoViewer.css" />
+    <Content Include="style\upload.css" />
   </ItemGroup>
 </Project>
