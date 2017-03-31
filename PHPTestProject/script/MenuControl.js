@@ -4,16 +4,10 @@ function MenuControl() {
     var containerDiv = document.createElement('div');
     containerDiv.classList.add('MenuControlContainer');
 
-    // Declare the menu div
-    var menuDiv = document.createElement('div');
-    menuDiv.classList.add('MenuControlExpandedMenu');
-    $(menuDiv).hide();
-    containerDiv.appendChild(menuDiv);
-
     // Add the header to the menu
     var menuHeaderDiv = document.createElement('div');
     menuHeaderDiv.classList.add('MenuControlExpandedMenuHeader');
-    menuDiv.appendChild(menuHeaderDiv);
+    containerDiv.appendChild(menuHeaderDiv);
 
     // Add the tag selector bar to the menu
     var tagSelectorDiv = document.createElement('div');
@@ -53,7 +47,7 @@ function MenuControl() {
     // Add the table
     tagSelectorTable.appendChild(tagSelectorTableRow);
     tagSelectorDiv.appendChild(tagSelectorTable);
-    menuDiv.appendChild(tagSelectorDiv);
+    containerDiv.appendChild(tagSelectorDiv);
 
 
     // Declare the button for expanding/hiding the menu
@@ -61,28 +55,13 @@ function MenuControl() {
     expandButton.classList.add('MenuControlExpandButton');
     expandButton.innerText = "<";
 
-    // Wire up listener to toggle the expand button
-    $(expandButton).click(function () {
-        if ($(menuDiv).is(':visible')) {
-            $.when($(menuDiv).hide("slide", { direction: "right" }, 200));
-            $(expandButton).text("<")
-        }
-        else {
-            $(menuDiv).show("slide", { direction: "right" }, 200);
-            $(expandButton).text(">")
-        }
-        
-    });
-
-    containerDiv.appendChild(expandButton);
-
     // Process the photo tags
     var tagsAndCounts = tagManager.GetTagAndPhotoCountSorted();
 
     // Build up the tag list
     var tagListContainerDiv = document.createElement('div');
     tagListContainerDiv.classList.add("MenuControlTagListContainer");
-    menuDiv.appendChild(tagListContainerDiv);
+    containerDiv.appendChild(tagListContainerDiv);
 
     // Add tags to the list
     for (var i = 0; i < tagsAndCounts.length; i++) {
@@ -118,7 +97,10 @@ function MenuControl() {
         tagListContainerDiv.appendChild(listElement);
     }
 
-    return containerDiv;
+    return {
+        container: containerDiv,
+        widget: expandButton
+    };
 }
 
 MenuControl.prototype.TagListItemClicked = function () {

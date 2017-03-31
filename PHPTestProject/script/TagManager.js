@@ -1,5 +1,5 @@
 ﻿/// <reference path="jquery/jquery-3.0.0.js" />
-/// <reference path="util.js" />
+
 // TagManager Class
 function TagManager() {
     this.TagPhotoDictionary = [];

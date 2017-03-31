@@ -10,20 +10,40 @@
             overflow: hidden;
         }
 
-        #map {
+        #pageContainer {
             height: 100%;
+            display: flex;
+            flex-flow: column;
         }
+
+        #toolbar {
+            flex: 0 0 40px;
+        }
+
+        #mainContainer {
+            flex: 1 1 auto;
+            height: 100%;
+            display: flex;
+            flex-flow: row;
+        }
+
+        #map {
+            flex: 1 1 auto;
+        }
+
+        #sidebar {
+            flex: 0 1 200px;
+        }
+
         #modalpane {
-            position: absolute;
-            top: 0px;
-            left: 0px;
             height: 100%;
             width: 100%;
             opacity: 0.7;
-            background-color: grey;
+            background-color: black;
             display: none;
             z-index: 1;
         }
+
         #photodiv {
             position: absolute;
             top: 50%;
@@ -35,16 +55,26 @@
     </style>
     <link rel="stylesheet" href="style/MenuControl.css" />
     <link rel="stylesheet" href="style/PhotoViewer.css" />
+    <link rel="stylesheet" href="style/Sidebar.css" />
+    <link rel="stylesheet" href="style/TopToolbar.css" />
+    <script src="script/jquery/jquery-3.0.0.js"></script>
+    <script src="script/jquery/jquery-ui.js"></script>
     <script src="script/MenuControl.js"></script>
     <script src="script/Photo.js"></script>
     <script src="script/PhotoManager.js"></script>
     <script src="script/PhotoViewer.js"></script>
+    <script src="script/Sidebar.js"></script>
     <script src="script/TagManager.js"></script>
-    <script src="script/jquery/jquery-3.0.0.js"></script>
-    <script src="script/jquery/jquery-ui.js"></script>
+    <script src="script/TopToolbar.js"></script>
 </head>
 <body>
-    <div id="map"></div>
+    <div id="pageContainer">
+        <div id="toolbar"></div>
+        <div id="mainContainer">
+            <div id="map"></div>
+            <div id="sidebar"></div>
+        </div>       
+    </div>
     <script language="javascript">
         var photoManager = new PhotoManager();
         var tagManager = new TagManager();
@@ -63,20 +93,42 @@
                 photoManager.ClearAllMarkers(true);
                 photoManager.CreateMarkers();
             });
+
+            // Append the modal pane on top of the map so that it will block interaction when shown
+            var modalPane = document.createElement("div");
+            modalPane.id = "modalpane";
+            document.getElementById('map').appendChild(modalPane);
+
+            // Append the photo viewer div on top of the modal pane so that it will show over it
+            var photoDiv = document.createElement("div");
+            photoDiv.id = "photodiv";
+            photoDiv.tabindex = 1;
+            document.getElementById('map').appendChild(photoDiv);
         }
 
-        $(document).ready(function() {
+        $(document).ready(function () {
+            // Initialize and show the top toolbar
+            topToolbar.setParent(document.getElementById('toolbar'));
+            topToolbar.show();
+
+            // Initialize and show the sidebar
+            sidebar.setParent(document.getElementById('sidebar'));
+            sidebar.show();
+
             $.when(photoManager.LoadPhotos())
                 .done(function () {
+                    // Performance marker
+                    window.performance.mark("mark_end_LoadPhotos");
+
+                    // Initialize and register the tag menu
+                    var menuControl = new MenuControl();
+                    sidebar.registerControl(menuControl.container);
+                    topToolbar.registerControl(menuControl.widget);
 
                     photoManager.CalculatePhotoDistances();
                     photoManager.SetupForCluster();
                     photoManager.DoCluster();
                     photoManager.CreateMarkers();
-
-                    var menuControl = new MenuControl();
-                    menuControl.index = 1;
-                    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(menuControl);
                 })
                 .fail(function() {
                     alert('Failed to load photos!');
@@ -90,7 +142,5 @@
             async defer>
 
     </script>
-    <div id="modalpane"></div>
-    <div id="photodiv" tabindex="1"></div>
 </body>
 </html>

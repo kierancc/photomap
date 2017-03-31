@@ -6,7 +6,9 @@
 }
 
 PhotoManager.prototype.LoadPhotos = function () {
-    
+    // Performance marker
+    window.performance.mark("mark_start_LoadPhotos");
+
     var context = this;
     return $.getJSON('../dataaccess/getphotos.php', function (data) {
         $.each(data, function (key, val) {
@@ -102,6 +104,9 @@ PhotoManager.prototype.GetRelativePathToPhoto = function(filename) {
 }
 
 PhotoManager.prototype.CalculatePhotoDistances = function () {
+    // Performance marker
+    window.performance.mark("mark_start_CalculatePhotoDistances");
+
     // Create 2D array to store distances
     this.PhotoDistances = new Array(this.Photos.length);
     for (var i = 0; i < this.Photos.length; i++) {
@@ -135,6 +140,9 @@ PhotoManager.prototype.CalculatePhotoDistances = function () {
             this.PhotoDistances[i][j] = d;
         }
     }
+
+    // Performance marker
+    window.performance.mark("mark_end_CalculatePhotoDistances");
 }
 
 // Clustering Functions
@@ -201,8 +209,14 @@ PhotoManager.prototype.SetupForCluster = function () {
 }
 
 PhotoManager.prototype.DoCluster = function () {
+    // Performance marker
+    window.performance.mark("mark_start_DoCluster");
+
     var newDistanceMatrix = this.CopyDistanceMatrix();
     this.Cluster(this.MAXZOOMLEVEL, newDistanceMatrix);
+
+    // Performance marker
+    window.performance.mark("mark_end_DoCluster");
 }
 
 PhotoManager.prototype.Cluster = function (zoomLevel, distanceMatrix) {

@@ -17,7 +17,7 @@
     <PHPDevAutoPort>true</PHPDevAutoPort>
     <CustomXdebugPort>9000</CustomXdebugPort>
     <PublishEvent>None</PublishEvent>
-    <SpecificPageValue>upload.php</SpecificPageValue>
+    <SpecificPageValue>index.php</SpecificPageValue>
     <StartAction>SpecificPage</StartAction>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -50,10 +50,14 @@
     <Content Include="script\Photo.js" />
     <Content Include="script\PhotoManager.js" />
     <Content Include="script\PhotoViewer.js" />
+    <Content Include="script\Sidebar.js" />
     <Content Include="script\TagManager.js" />
+    <Content Include="script\TopToolbar.js" />
     <Content Include="script\upload.js" />
     <Content Include="style\MenuControl.css" />
     <Content Include="style\PhotoViewer.css" />
+    <Content Include="style\Sidebar.css" />
+    <Content Include="style\TopToolbar.css" />
     <Content Include="style\upload.css" />
   </ItemGroup>
 </Project>
