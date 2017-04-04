@@ -1,17 +1,17 @@
 ﻿/// <reference path="jquery/jquery-3.0.0.js" />
-function MenuControl() {
+function TagMenuControl() {
     // Declare the container div for the control
     var containerDiv = document.createElement('div');
-    containerDiv.classList.add('MenuControlContainer');
+    containerDiv.classList.add('TagMenuControlContainer');
 
     // Add the header to the menu
     var menuHeaderDiv = document.createElement('div');
-    menuHeaderDiv.classList.add('MenuControlExpandedMenuHeader');
+    menuHeaderDiv.classList.add('TagMenuControlExpandedMenuHeader');
     containerDiv.appendChild(menuHeaderDiv);
 
     // Add the tag selector bar to the menu
     var tagSelectorDiv = document.createElement('div');
-    tagSelectorDiv.classList.add('MenuControlTagSelectors');
+    tagSelectorDiv.classList.add('TagMenuControlTagSelectors');
     var tagSelectorTable = document.createElement('table');
     tagSelectorTable.style.width = "100%";
     var tagSelectorTableRow = document.createElement('tr');
@@ -27,7 +27,7 @@ function MenuControl() {
 
     $(tagSelectorSelectAllLink).click(function () {
         tagManager.SetAllPhotosVisible();
-        $(".MenuControlTagListItemDisabled").switchClass("MenuControlTagListItemDisabled", "MenuControlTagListItemEnabled", 300);
+        $(".TagMenuControlTagListItemDisabled").switchClass("TagMenuControlTagListItemDisabled", "TagMenuControlTagListItemEnabled", 300);
     });
 
     // Build the select none link
@@ -41,7 +41,7 @@ function MenuControl() {
 
     $(tagSelectorSelectNoneLink).click(function () {
         tagManager.SetAllPhotosNotVisible();
-        $(".MenuControlTagListItemEnabled").switchClass("MenuControlTagListItemEnabled", "MenuControlTagListItemDisabled", 300);
+        $(".TagMenuControlTagListItemEnabled").switchClass("TagMenuControlTagListItemEnabled", "TagMenuControlTagListItemDisabled", 300);
     });
 
     // Add the table
@@ -54,27 +54,27 @@ function MenuControl() {
 
     // Build up the tag list
     var tagListContainerDiv = document.createElement('div');
-    tagListContainerDiv.classList.add("MenuControlTagListContainer");
+    tagListContainerDiv.classList.add("TagMenuControlTagListContainer");
     containerDiv.appendChild(tagListContainerDiv);
 
     // Add tags to the list
     for (var i = 0; i < tagsAndCounts.length; i++) {
         var listElement = document.createElement('div');
-        listElement.classList.add("MenuControlTagListItem");
-        listElement.classList.add("MenuControlTagListItemEnabled");
+        listElement.classList.add("TagMenuControlTagListItem");
+        listElement.classList.add("TagMenuControlTagListItemEnabled");
         listElement.id = "TagListItem" + tagsAndCounts[i].GetTag();
         
         // Build up a table for the contents
         var table = document.createElement('table');
-        table.classList.add("MenuControlTagListTable");
+        table.classList.add("TagMenuControlTagListTable");
 
         var tableRow = document.createElement('tr');
         var tableCell1 = document.createElement('td');
-        tableCell1.classList.add("MenuControlTagListTableLeftCell");
+        tableCell1.classList.add("TagMenuControlTagListTableLeftCell");
         tableCell1.innerText = tagsAndCounts[i].GetTag();
 
         var tableCell2 = document.createElement('td');
-        tableCell2.classList.add("MenuControlTagListTableRightCell");
+        tableCell2.classList.add("TagMenuControlTagListTableRightCell");
         tableCell2.innerText = tagsAndCounts[i].GetCount();
 
         // Wire up click
@@ -94,15 +94,15 @@ function MenuControl() {
     return containerDiv;
 }
 
-MenuControl.prototype.TagListItemClicked = function () {
+TagMenuControl.prototype.TagListItemClicked = function () {
     // Disable a tag
-    if ($(this).hasClass("MenuControlTagListItemEnabled")) {
-        $(this).switchClass("MenuControlTagListItemEnabled", "MenuControlTagListItemDisabled", 300);
+    if ($(this).hasClass("TagMenuControlTagListItemEnabled")) {
+        $(this).switchClass("TagMenuControlTagListItemEnabled", "TagMenuControlTagListItemDisabled", 300);
         tagManager.FilterTag($(this).data("tagName"), false);
     }
     // Enable a tag
     else {
-        $(this).switchClass("MenuControlTagListItemDisabled", "MenuControlTagListItemEnabled", 300);
+        $(this).switchClass("TagMenuControlTagListItemDisabled", "TagMenuControlTagListItemEnabled", 300);
         tagManager.FilterTag($(this).data("tagName"), true);
     }
 }

@@ -1,28 +1,28 @@
-﻿.MenuControlContainer {
+﻿.TagMenuControlContainer {
     display: flex;
     flex-direction: column;
     height: 100%;
 }
 
-.MenuControlExpandedMenuHeader {
+.TagMenuControlExpandedMenuHeader {
     flex: 0 0 100px;
     width: 100%;
     background-color: slategray;
 }
 
-.MenuControlTagSelectors {
+.TagMenuControlTagSelectors {
     flex: 0 0 auto;
     width: 100%;
     background-color: slategray;
 }
 
-.MenuControlTagListContainer {
+.TagMenuControlTagListContainer {
     flex: 1 1 auto;
     width: 100%;
     overflow-y: auto;
 }
 
-.MenuControlTagListItem {
+.TagMenuControlTagListItem {
     height: 25px;
     width: 80%;
     color: blue;
@@ -31,23 +31,23 @@
     cursor: pointer;
 }
 
-.MenuControlTagListItemEnabled {
+.TagMenuControlTagListItemEnabled {
     background-color: lightblue;
 }
 
-.MenuControlTagListItemDisabled {
+.TagMenuControlTagListItemDisabled {
     border-color: lightblue;
     border: thick;
 }
 
-.MenuControlTagListTable {
+.TagMenuControlTagListTable {
     width: 100%;
 }
 
-.MenuControlTagListTableLeftCell {
+.TagMenuControlTagListTableLeftCell {
     text-align: left;
 }
 
-.MenuControlTagListTableRightCell {
+.TagMenuControlTagListTableRightCell {
     text-align: right;
 }

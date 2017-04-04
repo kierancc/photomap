@@ -47,7 +47,7 @@
     <Content Include="images\loader.gif" />
     <Content Include="script\jquery\jquery-3.0.0.js" />
     <Content Include="script\jquery\jquery-ui.js" />
-    <Content Include="script\MenuControl.js" />
+    <Content Include="script\TagMenuControl.js" />
     <Content Include="script\Photo.js" />
     <Content Include="script\PhotoManager.js" />
     <Content Include="script\PhotoViewer.js" />
@@ -62,7 +62,7 @@
     <Content Include="style\images\ui-icons_cc0000_256x240.png" />
     <Content Include="style\images\ui-icons_ffffff_256x240.png" />
     <Content Include="style\jquery-ui.min.css" />
-    <Content Include="style\MenuControl.css" />
+    <Content Include="style\TagMenuControl.css" />
     <Content Include="style\PhotoViewer.css" />
     <Content Include="style\Sidebar.css" />
     <Content Include="style\TopToolbar.css" />
