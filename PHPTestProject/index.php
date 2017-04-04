@@ -55,6 +55,7 @@
     </style>
     <link rel="stylesheet" href="style/jquery-ui.min.css" />
     <link rel="stylesheet" href="style/TagMenuControl.css" />
+    <link rel="stylesheet" href="style/PhotoDetailControl.css" />
     <link rel="stylesheet" href="style/PhotoViewer.css" />
     <link rel="stylesheet" href="style/Sidebar.css" />
     <link rel="stylesheet" href="style/TopToolbar.css" />
@@ -62,6 +63,7 @@
     <script src="script/jquery/jquery-ui.js"></script>
     <script src="script/TagMenuControl.js"></script>
     <script src="script/Photo.js"></script>
+    <script src="script/PhotoDetailControl.js"></script>
     <script src="script/PhotoManager.js"></script>
     <script src="script/PhotoViewer.js"></script>
     <script src="script/Sidebar.js"></script>
@@ -132,9 +134,12 @@
                     // Performance marker
                     window.performance.mark("mark_end_LoadPhotos");
 
-                    // Initialize and register the tag menu
-                    var tagMenuControl = new TagMenuControl();
+                    // Initialize and register the tagMenuControl
+                    tagMenuControl.initialize();
                     sidebar.registerControl(tagMenuControl);
+
+                    // Register the photoDetailControl
+                    sidebar.registerControl(photoDetailControl);
 
                     photoManager.CalculatePhotoDistances();
                     photoManager.SetupForCluster();

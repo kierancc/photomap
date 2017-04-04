@@ -1,108 +1,123 @@
-﻿/// <reference path="jquery/jquery-3.0.0.js" />
-function TagMenuControl() {
-    // Declare the container div for the control
-    var containerDiv = document.createElement('div');
-    containerDiv.classList.add('TagMenuControlContainer');
+﻿var tagMenuControl = function () {
+    // Private members
+    var containerElement;
+    var friendlyName = "TagMenuControl";
 
-    // Add the header to the menu
-    var menuHeaderDiv = document.createElement('div');
-    menuHeaderDiv.classList.add('TagMenuControlExpandedMenuHeader');
-    containerDiv.appendChild(menuHeaderDiv);
+    // "Constructor" which will be called after photos have been loaded
+    var doInitialize = function () {
 
-    // Add the tag selector bar to the menu
-    var tagSelectorDiv = document.createElement('div');
-    tagSelectorDiv.classList.add('TagMenuControlTagSelectors');
-    var tagSelectorTable = document.createElement('table');
-    tagSelectorTable.style.width = "100%";
-    var tagSelectorTableRow = document.createElement('tr');
+        // Declare the container div for the control
+        containerElement = document.createElement('div');
+        containerElement.classList.add('TagMenuControlContainer');
 
-    // Build the select all link
-    var tagSelectorTableAllCell = document.createElement('td');
-    tagSelectorTableAllCell.style.textAlign = "left";
-    var tagSelectorSelectAllLink = document.createElement('span');
-    tagSelectorSelectAllLink.innerText = "Select All";
-    tagSelectorSelectAllLink.style.cursor = "pointer";
-    tagSelectorTableAllCell.appendChild(tagSelectorSelectAllLink);
-    tagSelectorTableRow.appendChild(tagSelectorTableAllCell);
+        // Add the header to the menu
+        var menuHeaderDiv = document.createElement('div');
+        menuHeaderDiv.classList.add('TagMenuControlExpandedMenuHeader');
+        containerElement.appendChild(menuHeaderDiv);
 
-    $(tagSelectorSelectAllLink).click(function () {
-        tagManager.SetAllPhotosVisible();
-        $(".TagMenuControlTagListItemDisabled").switchClass("TagMenuControlTagListItemDisabled", "TagMenuControlTagListItemEnabled", 300);
-    });
+        // Add the tag selector bar to the menu
+        var tagSelectorDiv = document.createElement('div');
+        tagSelectorDiv.classList.add('TagMenuControlTagSelectors');
+        var tagSelectorTable = document.createElement('table');
+        tagSelectorTable.style.width = "100%";
+        var tagSelectorTableRow = document.createElement('tr');
 
-    // Build the select none link
-    var tagSelectorTableNoneCell = document.createElement('td');
-    tagSelectorTableNoneCell.style.textAlign = "right";
-    var tagSelectorSelectNoneLink = document.createElement('span');
-    tagSelectorSelectNoneLink.innerText = "Select None";
-    tagSelectorSelectNoneLink.style.cursor = "pointer";
-    tagSelectorTableNoneCell.appendChild(tagSelectorSelectNoneLink);
-    tagSelectorTableRow.appendChild(tagSelectorTableNoneCell);
+        // Build the select all link
+        var tagSelectorTableAllCell = document.createElement('td');
+        tagSelectorTableAllCell.style.textAlign = "left";
+        var tagSelectorSelectAllLink = document.createElement('span');
+        tagSelectorSelectAllLink.innerText = "Select All";
+        tagSelectorSelectAllLink.style.cursor = "pointer";
+        tagSelectorTableAllCell.appendChild(tagSelectorSelectAllLink);
+        tagSelectorTableRow.appendChild(tagSelectorTableAllCell);
 
-    $(tagSelectorSelectNoneLink).click(function () {
-        tagManager.SetAllPhotosNotVisible();
-        $(".TagMenuControlTagListItemEnabled").switchClass("TagMenuControlTagListItemEnabled", "TagMenuControlTagListItemDisabled", 300);
-    });
+        $(tagSelectorSelectAllLink).click(function () {
+            tagManager.SetAllPhotosVisible();
+            $(".TagMenuControlTagListItemDisabled").switchClass("TagMenuControlTagListItemDisabled", "TagMenuControlTagListItemEnabled", 300);
+        });
 
-    // Add the table
-    tagSelectorTable.appendChild(tagSelectorTableRow);
-    tagSelectorDiv.appendChild(tagSelectorTable);
-    containerDiv.appendChild(tagSelectorDiv);
+        // Build the select none link
+        var tagSelectorTableNoneCell = document.createElement('td');
+        tagSelectorTableNoneCell.style.textAlign = "right";
+        var tagSelectorSelectNoneLink = document.createElement('span');
+        tagSelectorSelectNoneLink.innerText = "Select None";
+        tagSelectorSelectNoneLink.style.cursor = "pointer";
+        tagSelectorTableNoneCell.appendChild(tagSelectorSelectNoneLink);
+        tagSelectorTableRow.appendChild(tagSelectorTableNoneCell);
 
-    // Process the photo tags
-    var tagsAndCounts = tagManager.GetTagAndPhotoCountSorted();
+        $(tagSelectorSelectNoneLink).click(function () {
+            tagManager.SetAllPhotosNotVisible();
+            $(".TagMenuControlTagListItemEnabled").switchClass("TagMenuControlTagListItemEnabled", "TagMenuControlTagListItemDisabled", 300);
+        });
 
-    // Build up the tag list
-    var tagListContainerDiv = document.createElement('div');
-    tagListContainerDiv.classList.add("TagMenuControlTagListContainer");
-    containerDiv.appendChild(tagListContainerDiv);
+        // Add the table
+        tagSelectorTable.appendChild(tagSelectorTableRow);
+        tagSelectorDiv.appendChild(tagSelectorTable);
+        containerElement.appendChild(tagSelectorDiv);
 
-    // Add tags to the list
-    for (var i = 0; i < tagsAndCounts.length; i++) {
-        var listElement = document.createElement('div');
-        listElement.classList.add("TagMenuControlTagListItem");
-        listElement.classList.add("TagMenuControlTagListItemEnabled");
-        listElement.id = "TagListItem" + tagsAndCounts[i].GetTag();
-        
-        // Build up a table for the contents
-        var table = document.createElement('table');
-        table.classList.add("TagMenuControlTagListTable");
+        // Process the photo tags
+        var tagsAndCounts = tagManager.GetTagAndPhotoCountSorted();
 
-        var tableRow = document.createElement('tr');
-        var tableCell1 = document.createElement('td');
-        tableCell1.classList.add("TagMenuControlTagListTableLeftCell");
-        tableCell1.innerText = tagsAndCounts[i].GetTag();
+        // Build up the tag list
+        var tagListContainerDiv = document.createElement('div');
+        tagListContainerDiv.classList.add("TagMenuControlTagListContainer");
+        containerElement.appendChild(tagListContainerDiv);
 
-        var tableCell2 = document.createElement('td');
-        tableCell2.classList.add("TagMenuControlTagListTableRightCell");
-        tableCell2.innerText = tagsAndCounts[i].GetCount();
+        // Add tags to the list
+        for (var i = 0; i < tagsAndCounts.length; i++) {
+            var listElement = document.createElement('div');
+            listElement.classList.add("TagMenuControlTagListItem");
+            listElement.classList.add("TagMenuControlTagListItemEnabled");
+            listElement.id = "TagListItem" + tagsAndCounts[i].GetTag();
 
-        // Wire up click
-        $(listElement).click(this.TagListItemClicked);
+            // Build up a table for the contents
+            var table = document.createElement('table');
+            table.classList.add("TagMenuControlTagListTable");
 
-        // Store the tag in the div for future use
-        $(listElement).data("tagName", tagsAndCounts[i].GetTag());
+            var tableRow = document.createElement('tr');
+            var tableCell1 = document.createElement('td');
+            tableCell1.classList.add("TagMenuControlTagListTableLeftCell");
+            tableCell1.innerText = tagsAndCounts[i].GetTag();
 
-        tableRow.appendChild(tableCell1);
-        tableRow.appendChild(tableCell2);
-        table.appendChild(tableRow)
-        listElement.appendChild(table);
+            var tableCell2 = document.createElement('td');
+            tableCell2.classList.add("TagMenuControlTagListTableRightCell");
+            tableCell2.innerText = tagsAndCounts[i].GetCount();
 
-        tagListContainerDiv.appendChild(listElement);
-    }
+            // Wire up click
+            $(listElement).click(function () {
+                // Disable a tag
+                if ($(this).hasClass("TagMenuControlTagListItemEnabled")) {
+                    $(this).switchClass("TagMenuControlTagListItemEnabled", "TagMenuControlTagListItemDisabled", 300);
+                    tagManager.FilterTag($(this).data("tagName"), false);
+                }
+                // Enable a tag
+                else {
+                    $(this).switchClass("TagMenuControlTagListItemDisabled", "TagMenuControlTagListItemEnabled", 300);
+                    tagManager.FilterTag($(this).data("tagName"), true);
+                }
+            });
 
-    return containerDiv;
-}
+            // Store the tag in the div for future use
+            $(listElement).data("tagName", tagsAndCounts[i].GetTag());
 
-TagMenuControl.prototype.TagListItemClicked = function () {
-    // Disable a tag
-    if ($(this).hasClass("TagMenuControlTagListItemEnabled")) {
-        $(this).switchClass("TagMenuControlTagListItemEnabled", "TagMenuControlTagListItemDisabled", 300);
-        tagManager.FilterTag($(this).data("tagName"), false);
-    }
-    // Enable a tag
-    else {
-        $(this).switchClass("TagMenuControlTagListItemDisabled", "TagMenuControlTagListItemEnabled", 300);
-        tagManager.FilterTag($(this).data("tagName"), true);
-    }
-}
+            tableRow.appendChild(tableCell1);
+            tableRow.appendChild(tableCell2);
+            table.appendChild(tableRow);
+            listElement.appendChild(table);
+
+            tagListContainerDiv.appendChild(listElement);
+        }
+    };
+
+    return {
+        getFriendlyName: function () {
+            return friendlyName;
+        },
+        getContainerElement: function () {
+            return containerElement;
+        },
+        initialize: function () {
+            doInitialize();
+        }
+    };
+}();

@@ -48,10 +48,20 @@
         },
         registerControl: function (control) {
             // Save a reference to the control
-            controls.push(control);
+            controls[control.getFriendlyName()] = control.getContainerElement();
 
             // Add the control to the DOM
-            containerElement.appendChild(control);
+            containerElement.appendChild(controls[control.getFriendlyName()]);
+        },
+        showControl: function (controlName) {
+            Object.keys(controls).forEach(function (key) {
+                if (key === controlName) {
+                    $(controls[key]).show();
+                }
+                else {
+                    $(controls[key]).hide();
+                }
+            });
         }
     };
 }();

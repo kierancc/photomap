@@ -7,6 +7,7 @@ function PhotoViewer(type, photos) {
     this.images = [];
 
     this.SetupViewer();
+    sidebar.showControl(photoDetailControl.getFriendlyName());
 }
 
 PhotoViewer.prototype.GetType = function () {
@@ -121,6 +122,17 @@ PhotoViewer.prototype.SetupViewer = function () {
             }
         });
 
+    }
+    // Otherwise we only wire up the escape key listener to close the viewer
+    else {
+        // Wire up keyboard event listener for left and right arrow keys and the escape key
+        $('#photodiv').keydown(function (event) {
+            if (event.which == 27) {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                photoManager.PhotoViewer.ClosePhoto();
+            }
+        });
     }
 
     // Set up the photo control
@@ -249,6 +261,9 @@ PhotoViewer.prototype.ShowPhoto = function (animate) {
         // Set focus on the photo viewer
         $('#photodiv').focus();
     }
+
+    // Update the sidebar
+    photoDetailControl.showPhotoDetails(this.photos[this.index]);
 }
 
 PhotoViewer.prototype.ShowNextPhoto = function () {
@@ -264,6 +279,9 @@ PhotoViewer.prototype.ShowNextPhoto = function () {
         $('#PhotoViewer').empty();
         $('#PhotoViewer').append(this.images[this.index]);
         $('#PhotoViewer').fadeIn(100);
+
+        // Update the sidebar
+        photoDetailControl.showPhotoDetails(this.photos[this.index]);
 
         if (this.images[this.index + 1] === undefined) {
             this.LoadNextPhoto();
@@ -284,6 +302,9 @@ PhotoViewer.prototype.ShowPrevPhoto = function () {
         $('#PhotoViewer').empty();
         $('#PhotoViewer').append(this.images[this.index]);
         $('#PhotoViewer').fadeIn(100);
+
+        // Update the sidebar
+        photoDetailControl.showPhotoDetails(this.photos[this.index]);
     }
 }
 
@@ -297,4 +318,6 @@ PhotoViewer.prototype.ClosePhoto = function () {
 
     // Unwire keyboard event listener
     $('#photodiv').off("keydown");
+
+    sidebar.showControl(tagMenuControl.getFriendlyName());
 }
