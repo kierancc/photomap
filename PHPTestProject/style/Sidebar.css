@@ -3,3 +3,9 @@
     width: 100%;
     background-color: black;
 }
+
+#sidebarWidget {
+    background-color: aliceblue;
+    width: 16px;
+    height: 16px;
+}

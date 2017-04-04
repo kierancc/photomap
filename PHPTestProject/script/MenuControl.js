@@ -49,12 +49,6 @@ function MenuControl() {
     tagSelectorDiv.appendChild(tagSelectorTable);
     containerDiv.appendChild(tagSelectorDiv);
 
-
-    // Declare the button for expanding/hiding the menu
-    var expandButton = document.createElement('div');
-    expandButton.classList.add('MenuControlExpandButton');
-    expandButton.innerText = "<";
-
     // Process the photo tags
     var tagsAndCounts = tagManager.GetTagAndPhotoCountSorted();
 
@@ -97,10 +91,7 @@ function MenuControl() {
         tagListContainerDiv.appendChild(listElement);
     }
 
-    return {
-        container: containerDiv,
-        widget: expandButton
-    };
+    return containerDiv;
 }
 
 MenuControl.prototype.TagListItemClicked = function () {

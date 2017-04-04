@@ -5,12 +5,15 @@
     this.Markers = [];
 }
 
-PhotoManager.prototype.LoadPhotos = function () {
+PhotoManager.prototype.LoadPhotos = function (testMode) {
     // Performance marker
     window.performance.mark("mark_start_LoadPhotos");
 
+    // If testMode is true, pull photos from a smaller test database
+    var args = testMode === true ? "?testMode=true" : "";
+
     var context = this;
-    return $.getJSON('../dataaccess/getphotos.php', function (data) {
+    return $.getJSON('../dataaccess/getphotos.php' + args, function (data) {
         $.each(data, function (key, val) {
             var newPhoto = new Photo(val.filename, parseFloat(val.latitude), parseFloat(val.longitude), val.locationstring, val.tagsstring);
             context.Photos.push(newPhoto);

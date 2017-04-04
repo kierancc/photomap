@@ -41,6 +41,7 @@
     <Folder Include="style\" />
     <Folder Include="script\" />
     <Folder Include="script\jquery\" />
+    <Folder Include="style\images\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="images\loader.gif" />
@@ -54,6 +55,13 @@
     <Content Include="script\TagManager.js" />
     <Content Include="script\TopToolbar.js" />
     <Content Include="script\upload.js" />
+    <Content Include="style\images\ui-icons_444444_256x240.png" />
+    <Content Include="style\images\ui-icons_555555_256x240.png" />
+    <Content Include="style\images\ui-icons_777620_256x240.png" />
+    <Content Include="style\images\ui-icons_777777_256x240.png" />
+    <Content Include="style\images\ui-icons_cc0000_256x240.png" />
+    <Content Include="style\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="style\jquery-ui.min.css" />
     <Content Include="style\MenuControl.css" />
     <Content Include="style\PhotoViewer.css" />
     <Content Include="style\Sidebar.css" />

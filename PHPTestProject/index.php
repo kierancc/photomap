@@ -53,6 +53,7 @@
             display: none;
         }
     </style>
+    <link rel="stylesheet" href="style/jquery-ui.min.css" />
     <link rel="stylesheet" href="style/MenuControl.css" />
     <link rel="stylesheet" href="style/PhotoViewer.css" />
     <link rel="stylesheet" href="style/Sidebar.css" />
@@ -75,6 +76,16 @@
             <div id="sidebar"></div>
         </div>       
     </div>
+    <?php
+    if(array_key_exists("testMode", $_GET) && $_GET["testMode"] == true)
+    {
+        echo "<script>var testMode = true;</script>";
+    }
+    else
+    {
+        echo "<script>var testMode = false;</script>";
+    }
+    ?>
     <script language="javascript">
         var photoManager = new PhotoManager();
         var tagManager = new TagManager();
@@ -113,17 +124,17 @@
 
             // Initialize and show the sidebar
             sidebar.setParent(document.getElementById('sidebar'));
+            sidebar.createWidget();
             sidebar.show();
 
-            $.when(photoManager.LoadPhotos())
+            $.when(photoManager.LoadPhotos(testMode))
                 .done(function () {
                     // Performance marker
                     window.performance.mark("mark_end_LoadPhotos");
 
                     // Initialize and register the tag menu
                     var menuControl = new MenuControl();
-                    sidebar.registerControl(menuControl.container);
-                    topToolbar.registerControl(menuControl.widget);
+                    sidebar.registerControl(menuControl);
 
                     photoManager.CalculatePhotoDistances();
                     photoManager.SetupForCluster();

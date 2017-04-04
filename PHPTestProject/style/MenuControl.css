@@ -4,21 +4,6 @@
     height: 100%;
 }
 
-.MenuControlExpandButton {
-    width: 20px;
-    height: 20px;
-    background-color: aliceblue;
-    color: darkblue;
-    top: 10px;
-    right: 10px;
-    text-align: center;
-    font-size: medium;
-    font-weight: bolder;
-    line-height: 20px;
-    z-index: 2;
-    cursor: pointer;
-}
-
 .MenuControlExpandedMenuHeader {
     flex: 0 0 100px;
     width: 100%;
