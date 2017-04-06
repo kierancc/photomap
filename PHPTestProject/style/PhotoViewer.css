@@ -24,10 +24,6 @@
     cursor: pointer;
 }
 
-.PhotoViewerBottomToolbar {
-    height: 50px;
-}
-
 .PhotoViewerToolbarLink {
     font-size: x-large;
     color: black;
@@ -46,17 +42,6 @@
 
 #PhotoViewerNameCell {
     width: 50%;
-    text-align: left;
-    font-weight: bolder;
-}
-
-#PhotoViewerLocationCell {
-    width: 50%;
-    text-align: left;
-    font-weight: bolder;
-}
-
-#PhotoViewerTagsCell {
     text-align: left;
     font-weight: bolder;
 }

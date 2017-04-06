@@ -44,6 +44,22 @@
             z-index: 1;
         }
 
+        #loadingpane {
+            height: 100%;
+            width: 100%;
+            opacity: 0.7;
+            background-color: black;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+
+        #loadingpane img {
+            
+        }
+
         #photodiv {
             position: absolute;
             top: 50%;
@@ -79,7 +95,7 @@
         </div>       
     </div>
     <?php
-    if(array_key_exists("testMode", $_GET) && $_GET["testMode"] == true)
+    if(array_key_exists("testMode", $_GET) && $_GET["testMode"] == "true")
     {
         echo "<script>var testMode = true;</script>";
     }
@@ -117,6 +133,13 @@
             photoDiv.id = "photodiv";
             photoDiv.tabindex = 1;
             document.getElementById('map').appendChild(photoDiv);
+
+            // Append the loading div on top of everything
+            var loadingPane = document.createElement("div");
+            loadingPane.id = "loadingpane";
+            $(loadingPane).html("<img src=\"images/circle_loader.gif\">");
+            document.getElementById('map').appendChild(loadingPane);
+            $(loadingPane).show();
         }
 
         $(document).ready(function () {
@@ -141,10 +164,17 @@
                     // Register the photoDetailControl
                     sidebar.registerControl(photoDetailControl);
 
-                    photoManager.CalculatePhotoDistances();
-                    photoManager.SetupForCluster();
-                    photoManager.DoCluster();
-                    photoManager.CreateMarkers();
+                    $.when(photoManager.CalculatePhotoDistances())
+                        .done(function () {
+                            photoManager.SetupForCluster();
+
+                            $.when(photoManager.DoCluster())
+                                .done(function () {
+                                    photoManager.CreateMarkers();
+
+                                    $('#loadingpane').remove();
+                                });
+                        });
                 })
                 .fail(function() {
                     alert('Failed to load photos!');

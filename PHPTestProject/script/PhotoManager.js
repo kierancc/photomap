@@ -15,7 +15,7 @@ PhotoManager.prototype.LoadPhotos = function (testMode) {
     var context = this;
     return $.getJSON('../dataaccess/getphotos.php' + args, function (data) {
         $.each(data, function (key, val) {
-            var newPhoto = new Photo(val.filename, parseFloat(val.latitude), parseFloat(val.longitude), val.locationstring, val.tagsstring);
+            var newPhoto = new Photo(val.filename, parseFloat(val.latitude), parseFloat(val.longitude), val.locationstring, val.tagsstring, val.datetaken);
             context.Photos.push(newPhoto);
             tagManager.RegisterPhoto(newPhoto, context.Photos.length - 1);
         });

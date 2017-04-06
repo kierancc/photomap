@@ -1,10 +1,11 @@
-﻿function Photo(filename, latitude, longitude, locationString, tagsString) {
+﻿function Photo(filename, latitude, longitude, locationString, tagsString, dateTaken) {
     this.fileName = filename;
     this.latitude = latitude;
     this.longitude = longitude;
     this.locationString = locationString;
     this.tagsString = tagsString;
     this.isVisible = true; // All Photos are 'on' by default
+    this.dateTaken = dateTaken;
 }
 
 Photo.prototype.GetFilename = function () {
@@ -33,4 +34,8 @@ Photo.prototype.IsVisible = function () {
 
 Photo.prototype.SetIsVisible = function (visible) {
     this.isVisible = visible;
+}
+
+Photo.prototype.GetDateTaken = function () {
+    return this.dateTaken;
 }

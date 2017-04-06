@@ -5,3 +5,24 @@
     width: 100%;
     background-color: darkgrey;
 }
+
+.PhotoDetailBigLabel {
+    font-size: large;
+    font-weight: bold;
+}
+
+.PhotoDetailSubLabel {
+    padding-left: 10px;
+    font-size: medium;
+    font-weight: bold;
+}
+
+.PhotoDetailValue {
+    padding-left: 10px;
+    word-wrap: break-word;
+}
+
+.PhotoDetailSubValue {
+    padding-left: 20px;
+    word-wrap: break-word;
+}
