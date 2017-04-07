@@ -1,84 +1,66 @@
-﻿/// <reference path="jquery/jquery-3.0.0.js" />
-function PhotoViewer(type, photos) {
-    // Save variables
-    this.type = type;
-    this.photos = photos;
-    this.index = 0;
-    this.images = [];
+﻿var photoViewer = function () {
+    // Private members
+    var currentCollection;
+    var parentElement;
+    var containerElement;
+    var viewerElement;
+    var carouselElement;
 
-    this.SetupViewer();
-    sidebar.showControl(photoDetailControl.getFriendlyName());
-}
+    // Functions
+    var doDestroyCollection = function () {
+        disableKeyListeners();
+        sidebar.showControl(tagMenuControl.getFriendlyName());
 
-PhotoViewer.prototype.GetType = function () {
-    return this.type;
-}
+        $('#modalpane').fadeOut(1500);
+        $(parentElement).fadeOut(1500, function () {
+            $(viewerElement).empty();
+            currentCollection = null;
+        });            
+    };
 
-PhotoViewer.prototype.SetupViewer = function () {
-    // Delete any old viewer control
-    $('#photodiv').empty();
-    $('#photodiv').hide();
+    var showNextPhoto = function () {
+        if ((currentCollection.index + 1 < currentCollection.photos.length) && (currentCollection.images[currentCollection.index + 1] !== undefined)) {
+            currentCollection.index++;
 
-    // Create the containing div
-    var containerDiv = document.createElement('div');
-    containerDiv.id = "PhotoViewerContainer";
-    $('#photodiv').append(containerDiv);
+            $(viewerElement).hide();
+            $(viewerElement).empty();
+            $(viewerElement).append(currentCollection.images[currentCollection.index]);
+            $(viewerElement).fadeIn(100);
 
-    // Create the "toolbar" div
-    var toolbarDiv = document.createElement('div');
-    toolbarDiv.id = "PhotoViewerToolbar";
-    toolbarDiv.classList.add("PhotoViewerToolbar");
-    toolbarDiv.classList.add("PhotoViewerTopToolbar");
-    var toolbarTable = document.createElement('table');
-    toolbarTable.className = "PhotoViewerToolbarTable";
-    var toolbarTableRow = document.createElement('tr');
+            // Update the sidebar
+            photoDetailControl.showPhotoDetails(currentCollection.photos[currentCollection.index]);
+        }
+        else if (currentCollection.index === (currentCollection.photos.length - 1)) {
+            alert("You are viewing the last photo in this collection");
+        }
+        else {
+            alert("Next photo is not loaded yet");
+        }
+    };
 
-    // Add an empty first cell
-    var toolbarTableFirstCell = document.createElement('td');
-    toolbarTableFirstCell.style.width = "33%";
-    toolbarTableRow.appendChild(toolbarTableFirstCell);
+    var showPrevPhoto = function () {
+        if (currentCollection.index - 1 >= 0) {
+            currentCollection.index--;
 
-    // Second cell has the current photo number and count
-    var toolbarTableTitleCell = document.createElement('td');
-    toolbarTableTitleCell.id = "PhotoViewerTitleCell";
-    toolbarTableTitleCell.innerText = this.index + 1 + " / " + this.photos.length;
-    toolbarTableRow.appendChild(toolbarTableTitleCell);
-    
-    var closeButton = document.createElement('a');
-    closeButton.className = "PhotoViewerToolbarLink";
-    closeButton.href = "#";
-    closeButton.innerText = "X";
-    $(toolbarDiv).append($(closeButton));
-    
-    $(closeButton).click(function () {
-        photoManager.PhotoViewer.ClosePhoto();
-    });
+            $(viewerElement).hide();
+            $(viewerElement).empty();
+            $(viewerElement).append(currentCollection.images[currentCollection.index]);
+            $(viewerElement).fadeIn(100);
 
-    // Last cell has the close button
-    var toolbarTableLastCell = document.createElement('td');
-    toolbarTableLastCell.style.width = "33%";
-    toolbarTableLastCell.style.textAlign = "right";
-    toolbarTableLastCell.appendChild(closeButton);
-    toolbarTableRow.appendChild(toolbarTableLastCell);
+            // Update the sidebar
+            photoDetailControl.showPhotoDetails(currentCollection.photos[currentCollection.index]);
+        }
+        else {
+            alert("You are viewing the first photo in this collection");
+        }
+    };
 
-    toolbarTable.appendChild(toolbarTableRow);
-    toolbarDiv.appendChild(toolbarTable);
-
-    $(containerDiv).append($(toolbarDiv));
-
-    //TODO: Fix bug where making the parent container draggable causes the CSS transformation to happen after clicking on it, making the dragging weird 
-    $(containerDiv).draggable({
-        handle: "#PhotoViewerToolbar",
-        cursor: "pointer"
-    });
-
-    // If this viewer is for a cluster of photos we need to add and wire up the next/prev buttons
-    if (this.type === PhotoViewer.Type.CLUSTER) {
+    var createPrevNextButtons = function () {
         var prevButton = document.createElement('div');
         prevButton.id = "PhotoViewerPrevButton";
         prevButton.innerText = "<";
         $(prevButton).click(function () {
-            photoManager.PhotoViewer.ShowPrevPhoto();
+            showPrevPhoto();
         });
         $(prevButton).hover(
             function () {
@@ -87,13 +69,13 @@ PhotoViewer.prototype.SetupViewer = function () {
             function () {
                 $(this).fadeTo(150, 0);
             });
-        $(containerDiv).append(prevButton);
+        $(containerElement).append(prevButton);
 
         var nextButton = document.createElement('div');
         nextButton.id = "PhotoViewerNextButton";
         nextButton.innerText = ">";
         $(nextButton).click(function () {
-            photoManager.PhotoViewer.ShowNextPhoto();
+            showNextPhoto();
         });
         $(nextButton).hover(
             function () {
@@ -101,173 +83,138 @@ PhotoViewer.prototype.SetupViewer = function () {
             },
             function () {
                 $(this).fadeTo(150, 0);
-            })
-        $(containerDiv).append(nextButton);
+            });
+        $(containerElement).append(nextButton);
+    };
 
-        // Wire up keyboard event listener for left and right arrow keys and the escape key
-        $('#photodiv').keydown(function (event) {
-            if (event.which == 37 || event.which == 39|| event.which == 27) {
-                event.preventDefault();
-                event.stopImmediatePropagation();
-                
-                if (event.which == 37) {
-                    photoManager.PhotoViewer.ShowPrevPhoto();
+    var showPrevNextButtons = function () {
+        $('#PhotoViewerPrevButton').fadeTo(100, 1);
+        $('#PhotoViewerNextButton').fadeTo(100, 1);
+    };
+
+    var hidePrevNextButtons = function () {
+        $('#PhotoViewerPrevButton').fadeTo(100, 0);
+        $('#PhotoViewerNextButton').fadeTo(100, 0);
+    };
+
+    var disableKeyListeners = function () {
+        $('#PhotoViewerContainer').off("keydown");
+    };
+
+    var enableKeyListeners = function () {
+        // If this viewer is for a cluster of photos we need to add and wire up the next/prev buttons
+        if (currentCollection.getType() === PhotoCollection.Type.CLUSTER) {
+            // Wire up keyboard event listener for left and right arrow keys and the escape key
+            $('#PhotoViewerContainer').keydown(function (event) {
+                if (event.which == 37 || event.which == 39 || event.which == 27) {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+
+                    if (event.which == 37) {
+                        showPrevPhoto();
+                    }
+                    else if (event.which == 39) {
+                        showNextPhoto();
+                    }
+                    else if (event.which == 27) {
+                        doDestroyCollection();
+                    }
                 }
-                else if (event.which == 39) {
-                    photoManager.PhotoViewer.ShowNextPhoto();
+            });
+
+        }
+        // Otherwise we only wire up the escape key listener to close the viewer
+        else {
+            // Wire up keyboard event listener for the escape key
+            $('#PhotoViewerContainer').keydown(function (event) {
+                if (event.which == 27) {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    doDestroyCollection();
                 }
-                else if (event.which == 27) {
-                    photoManager.PhotoViewer.ClosePhoto();
+            });
+        }
+    };
+
+    var onFirstImageLoaded = function (e) {
+        viewerElement.appendChild(currentCollection.images[0]);
+        sidebar.showControl(photoDetailControl.getFriendlyName());
+        photoDetailControl.showPhotoDetails(currentCollection.photos[0]);
+    };
+
+    var loadPhotos = function () {
+        return $.each(currentCollection.photos, function (key, val) {
+            var fullRelPath = photoManager.getRelativePathToPhoto(val.GetFilename());
+            var image = new Image();
+
+            image.onload = function () {
+                currentCollection.images[key] = this;
+
+                // If the image loaded is the first image, trigger an event for this
+                // so that the loading gif will be removed and the image shown
+                if (key === 0) {
+                    $(document).trigger("photoViewer:firstImageLoaded");
                 }
-            }
+            };
+
+            image.onerror = function (error) {
+                alert("Failed to load photo " + key + " : " + error);
+            };
+
+            image.src = fullRelPath;
         });
+    };
 
-    }
-    // Otherwise we only wire up the escape key listener to close the viewer
-    else {
-        // Wire up keyboard event listener for left and right arrow keys and the escape key
-        $('#photodiv').keydown(function (event) {
-            if (event.which == 27) {
-                event.preventDefault();
-                event.stopImmediatePropagation();
-                photoManager.PhotoViewer.ClosePhoto();
-            }
-        });
-    }
+    // "Constructor"
+    // Build the container element
+    containerElement = document.createElement("div");
+    containerElement.id = "PhotoViewerContainer";
+    containerElement.tabIndex = 1;
 
-    // Set up the photo control
-    var controlDiv = document.createElement('div');
-    controlDiv.id = "PhotoViewer";
+    // Build the close button
+    var closeButton = document.createElement('a');
+    closeButton.id = "PhotoViewerCloseButton";
+    closeButton.href = "#";
+    closeButton.innerText = "X";
 
-    // Add the control to the parent div
-    $(containerDiv).append($(controlDiv));
-}
-
-PhotoViewer.prototype.ShowPrevNextButtons = function () {
-    $('#PhotoViewerPrevButton').fadeTo(100, 1);
-    $('#PhotoViewerNextButton').fadeTo(100, 1);
-}
-
-PhotoViewer.prototype.HidePrevNextButtons = function () {
-    $('#PhotoViewerPrevButton').fadeTo(100, 0);
-    $('#PhotoViewerNextButton').fadeTo(100, 0);
-}
-
-PhotoViewer.prototype.LoadFirstPhoto = function () {
-    var viewWidth = $(window).width();
-    var viewHeight = $(window).height();
-
-    var relativeFile = photoManager.GetRelativePathToPhoto(this.photos[0].GetFilename());
-    var photo = new Image();
-    photo.src = relativeFile;
-    photo.onload = function () {
-        $('#PhotoViewer').empty().append(photo);
-
-        photoManager.PhotoViewer.images.push(photo);
-
-        // If this viewer is for a cluster, first show the prev/next buttons and then set a timer to fade out the prev/next buttons after a few seconds
-        if (photoManager.PhotoViewer.GetType() === PhotoViewer.Type.CLUSTER) {
-            photoManager.PhotoViewer.ShowPrevNextButtons();
-            window.setTimeout(function () {
-                if (photoManager.PhotoViewer !== null)
-                    photoManager.PhotoViewer.HidePrevNextButtons();
-            }, 3000);
-
-            // Special case: Load the next photo in the sequence.  We need to prevent a race condition when loading photos to ensure the order is preserved
-            // so we will wait to load the second photo until the first has been loaded.  Since the subsequent photos are loaded one by one as the user clicks
-            // through them, we only need to take care here
-            photoManager.PhotoViewer.LoadNextPhoto();
-        }
-    }
-    photo.onerror = function () {
-        $('#PhotoViewer').empty().html('Photo failed to load');
-    }
-
-    $('#PhotoViewer').empty().html('<img src=\"../images/loader.gif\">');
-}
-
-PhotoViewer.prototype.LoadNextPhoto = function () {
-    if (this.index + 1 < this.photos.length) {
-        var viewWidth = $(window).width();
-        var viewHeight = $(window).height();
-
-        var relativeFile = photoManager.GetRelativePathToPhoto(this.photos[this.index + 1].GetFilename());
-        var photo = new Image();
-        photo.src = relativeFile;
-        photo.onload = function () {
-            photoManager.PhotoViewer.images.push(photo);
-        }
-        photo.onerror = function () {
-            alert('Failed to load next photo');
-        }
-    }
-}
-
-PhotoViewer.Type = { SINGLE: 1, CLUSTER: 2 }
-
-PhotoViewer.prototype.ShowPhoto = function (animate) {
-    // Show the parent div
-    if (animate) {
-        $('#photodiv').fadeIn(1500, function () {
-            // Set focus on the photo viewer
-            $('#photodiv').focus();
-        });
-        $('#modalpane').show().fadeIn(1500);
-    }
-    else {
-        $('#photodiv').show();
-        // Set focus on the photo viewer
-        $('#photodiv').focus();
-    }
-
-    // Update the sidebar
-    photoDetailControl.showPhotoDetails(this.photos[this.index]);
-}
-
-PhotoViewer.prototype.ShowNextPhoto = function () {
-    if ((this.index + 1 < this.photos.length) && (this.images[this.index + 1] !== undefined)) {
-        this.index++;
-
-        $('#PhotoViewerTitleCell').empty().text(this.index + 1 + " / " + this.photos.length);
-        $('#PhotoViewer').hide();
-        $('#PhotoViewer').empty();
-        $('#PhotoViewer').append(this.images[this.index]);
-        $('#PhotoViewer').fadeIn(100);
-
-        // Update the sidebar
-        photoDetailControl.showPhotoDetails(this.photos[this.index]);
-
-        if (this.images[this.index + 1] === undefined) {
-            this.LoadNextPhoto();
-        }
-    }
-}
-
-PhotoViewer.prototype.ShowPrevPhoto = function () {
-    if (this.index - 1 >= 0) {
-        this.index--;
-
-        $('#PhotoViewerTitleCell').empty().text(this.index + 1 + " / " + this.photos.length);
-        $('#PhotoViewer').hide();
-        $('#PhotoViewer').empty();
-        $('#PhotoViewer').append(this.images[this.index]);
-        $('#PhotoViewer').fadeIn(100);
-
-        // Update the sidebar
-        photoDetailControl.showPhotoDetails(this.photos[this.index]);
-    }
-}
-
-PhotoViewer.prototype.ClosePhoto = function () {
-    $('#photodiv').fadeOut(1500, function () {
-        $('#photodiv').empty();
+    $(closeButton).click(function () {
+        doDestroyCollection();
     });
-    $('#modalpane').fadeOut(1500);
-    
-    photoManager.PhotoViewer = null;
 
-    // Unwire keyboard event listener
-    $('#photodiv').off("keydown");
+    $(containerElement).append($(closeButton));
 
-    sidebar.showControl(tagMenuControl.getFriendlyName());
-}
+    // Build the viewer element
+    viewerElement = document.createElement("div");
+    viewerElement.id = "PhotoViewer";
+
+    $(containerElement).append(viewerElement);
+
+    // Create the prev and next buttons
+    createPrevNextButtons();
+
+    // Bind events
+    $(document).on("photoViewer:firstImageLoaded", onFirstImageLoaded);
+
+    // Public members
+    return {
+        setParent: function (parent) {
+            parentElement = parent;
+            $(parentElement).append(containerElement);
+        },
+        hideCollection: function () {
+            doDestroyCollection();
+        },
+        showCollection: function (newCollection) {
+            currentCollection = newCollection;
+            loadPhotos();
+            
+            $('#modalpane').fadeIn(1500);
+            $(parentElement).fadeIn(1500, function () {
+                // Set focus on the photo viewer
+                $('#PhotoViewerContainer').focus();
+                enableKeyListeners();
+            });
+            
+        }
+    };
+}();

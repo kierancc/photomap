@@ -1,392 +1,327 @@
-﻿function PhotoManager() {
-    this.PhotoDistances = [];
-    this.Clusters = [];
-    this.Photos = [];
-    this.Markers = [];
-}
+﻿var photoManager = function () {
+    // Private members
 
-PhotoManager.prototype.LoadPhotos = function (testMode) {
-    // Performance marker
-    window.performance.mark("mark_start_LoadPhotos");
+    // Constants
+    var PHOTOPATH = 'photos/';
+    var R = 6371e3;
+    var MAXZOOMLEVEL = 25;
+    var MINZOOMLEVEL = 0;
+    var MAXCIRCLESCALE = 24;
+    var MINCIRCLESCALE = 8;
+    var CIRCLESCALERANGE = 16;
 
-    // If testMode is true, pull photos from a smaller test database
-    var args = testMode === true ? "?testMode=true" : "";
+    // Variables
+    var photoDistances = [];
+    var clusters = [];
+    var photos = [];
+    var markers = [];
 
-    var context = this;
-    return $.getJSON('../dataaccess/getphotos.php' + args, function (data) {
-        $.each(data, function (key, val) {
-            var newPhoto = new Photo(val.filename, parseFloat(val.latitude), parseFloat(val.longitude), val.locationstring, val.tagsstring, val.datetaken);
-            context.Photos.push(newPhoto);
-            tagManager.RegisterPhoto(newPhoto, context.Photos.length - 1);
-        });
-    });
-}
+    // Functions
+    // Clustering Functions
+    var copyDistanceMatrix = function () {
+        var newDistanceMatrix = [];
 
-PhotoManager.prototype.CreateMarkers = function () {
-    for (var i = 0; i < this.Clusters[map.zoom].length; i++) {
-        var position = { lat: this.Clusters[map.zoom][i].GetLatitude(), lng: this.Clusters[map.zoom][i].GetLongitude() };
-        var name = "Cluster " + i;
+        for (var i = 0; i < photoDistances.length; i++) {
+            if (!photos[i].IsVisible()) continue;
+            newDistanceMatrix.push([]);
 
-        var marker = new google.maps.Marker({
-            position: position,
-            map: map
-        });
-
-        var clusterPhotos = this.Clusters[map.zoom][i].GetPhotos();
-        marker.setIcon(this.CreateIcon(clusterPhotos.length));
-
-        // Single photo case
-        if (clusterPhotos.length == 1) {
-            marker.type = 'photo';
-            marker.setTitle("1 photo");
-            marker.id = i
-
-            marker.addListener('click', function () {
-                var photoViewer = new PhotoViewer(PhotoViewer.Type.SINGLE, photoManager.Clusters[map.zoom][this.id].GetPhotos());
-                photoViewer.LoadFirstPhoto();
-                photoViewer.ShowPhoto(true);
-                photoManager.PhotoViewer = photoViewer;
-            });
+            for (var j = 0; j < photoDistances.length; j++) {
+                if (!photos[j].IsVisible()) continue;
+                newDistanceMatrix[newDistanceMatrix.length - 1].push(photoDistances[i][j]);
+            }
         }
 
-        else {
-            marker.type = 'cluster';
-            marker.setTitle(clusterPhotos.length + " photos");
-            marker.id = i;
-
-            marker.addListener('click', function () {
-                var photoViewer = new PhotoViewer(PhotoViewer.Type.CLUSTER, photoManager.Clusters[map.zoom][this.id].GetPhotos());
-                photoViewer.LoadFirstPhoto();
-                photoViewer.ShowPhoto(true);
-                photoManager.PhotoViewer = photoViewer;
-            });
-        }
-
-        this.Markers.push(marker);
-    }
-
-}
-
-PhotoManager.prototype.CreateIcon = function (numPhotos) {
-    var totalVisiblePhotos = tagManager.GetVisiblePhotosCount();
-    var extraScale = (numPhotos / totalVisiblePhotos) * this.CIRCLESCALERANGE;
-    var scale = this.MINCIRCLESCALE + extraScale;
-
-    return {
-        fillColor: 'red',
-        fillOpacity: 0.5,
-        strokeColor: 'white',
-        strokeWeight: 0.5,
-        path: google.maps.SymbolPath.CIRCLE,
-        scale: scale
+        return newDistanceMatrix;
     };
-}
 
-PhotoManager.prototype.ClearAllMarkers = function (deleteMarkers) {
-    for (var i = 0; i < this.Markers.length; i++) {
-        this.Markers[i].setMap(null);
-    }
+    var copyClusterArray = function (srcArray) {
+        var dstArray = new Array(srcArray.length);
 
-    if (deleteMarkers) {
-        this.Markers = [];
-    }
-}
-
-// Constants
-PhotoManager.prototype.PhotoPath = 'photos/';
-PhotoManager.prototype.R = 6371e3;
-PhotoManager.prototype.MAXZOOMLEVEL = 25;
-PhotoManager.prototype.MINZOOMLEVEL = 0;
-PhotoManager.prototype.MAXCIRCLESCALE = 24;
-PhotoManager.prototype.MINCIRCLESCALE = 8;
-PhotoManager.prototype.CIRCLESCALERANGE = 16;
-
-// Functions
-PhotoManager.prototype.GetRelativePathToPhoto = function(filename) {
-    return this.PhotoPath + filename;
-}
-
-PhotoManager.prototype.CalculatePhotoDistances = function () {
-    // Performance marker
-    window.performance.mark("mark_start_CalculatePhotoDistances");
-
-    // Create 2D array to store distances
-    this.PhotoDistances = new Array(this.Photos.length);
-    for (var i = 0; i < this.Photos.length; i++) {
-        this.PhotoDistances[i] = new Array(this.Photos.length);
-    }
-
-    // Iterate over photos and compare distances
-    for (var i = 0; i < this.PhotoDistances.length; i++) {
-        for (var j = 0; j < this.PhotoDistances[i].length; j++) {
-            // handle the case where i == j
-            if (i == j) {
-                this.PhotoDistances[i][j] = 0;
-                continue;
-            }
-
-            // Compute the distance between coordinates using the haversine method
-            // http://www.movable-type.co.uk/scripts/latlong.html
-            var lat1rad = this.Photos[i].GetLatitude().toRadians();
-            var lat2rad = this.Photos[j].GetLatitude().toRadians();
-            var deltalatrad = (this.Photos[i].GetLatitude() - this.Photos[j].GetLatitude()).toRadians();
-            var deltalongrad = (this.Photos[i].GetLongitude() - this.Photos[j].GetLongitude()).toRadians();
-
-            var a = Math.sin(deltalatrad / 2) * Math.sin(deltalatrad / 2) +
-                    Math.cos(lat1rad) * Math.cos(lat2rad) *
-                    Math.sin(deltalongrad / 2) * Math.sin(deltalongrad / 2);
-
-            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-            var d = this.R * c;
-
-            this.PhotoDistances[i][j] = d;
+        for (var i = 0; i < srcArray.length; i++) {
+            dstArray[i] = srcArray[i].Clone();
         }
-    }
 
-    // Performance marker
-    window.performance.mark("mark_end_CalculatePhotoDistances");
-}
+        return dstArray;
+    };
 
-// Clustering Functions
-PhotoManager.prototype.CopyDistanceMatrix = function () {
-    var newDistanceMatrix = [];
+    var getClosestCluster = function (distanceMatrix) {
+        var minDistance = Number.MAX_VALUE;
+        var c1 = -1;
+        var c2 = -1;
 
-    for (var i = 0; i < this.PhotoDistances.length; i++) {
-        if (!this.Photos[i].IsVisible()) continue;
-        newDistanceMatrix.push([]);
+        for (var i = 0; i < distanceMatrix.length; i++) {
+            for (var j = i + 1; j < distanceMatrix.length; j++) {
+                var distance = distanceMatrix[i][j];
 
-        for (var j = 0; j < this.PhotoDistances.length; j++) {
-            if (!this.Photos[j].IsVisible()) continue;
-            newDistanceMatrix[newDistanceMatrix.length-1].push(this.PhotoDistances[i][j]);
-        }
-    }
-
-    return newDistanceMatrix;
-}
-
-PhotoManager.prototype.CopyClusterArray = function (srcArray) {
-    var dstArray = new Array(srcArray.length);
-
-    for (var i = 0; i < srcArray.length; i++) {
-        dstArray[i] = srcArray[i].Clone();
-    }
-    
-    return dstArray;
-}
-
-PhotoManager.prototype.GetClosestCluster = function (distanceMatrix) {
-    var minDistance = Number.MAX_VALUE;
-    var c1 = -1;
-    var c2 = -1;
-
-    for (var i = 0; i < distanceMatrix.length; i++) {
-        for (var j = i + 1; j < distanceMatrix.length; j++) {
-            var distance = distanceMatrix[i][j];
-
-            if (distance < minDistance) {
-                minDistance = distance;
-                c1 = i;
-                c2 = j;
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    c1 = i;
+                    c2 = j;
+                }
             }
         }
-    }
 
-    return { distance: minDistance, cluster1: c1, cluster2: c2}
-}
+        return { distance: minDistance, cluster1: c1, cluster2: c2 }
+    };
 
-PhotoManager.prototype.SetupForCluster = function () {
-    // Create the clusters data structure
-    this.Clusters = new Array(this.MAXZOOMLEVEL + 1); // Need to have max level + 1 elements since 0 is a valid zoom level
+    var mergeClusters = function (cluster1, cluster2) {
+        var newCluster = new Cluster();
 
-    for (var i = 0 ; i < this.Clusters.length; i++) {
-        this.Clusters[i] = new Array();
-    }
+        newCluster.AddPhotos(cluster1.GetPhotos());
+        newCluster.AddPhotos(cluster2.GetPhotos());
 
-    // Initially populate the highest zoom level with each photo as its own cluster (only if the photo is visible)
-    for (var i = 0; i < this.Photos.length; i++) {
-        if (this.Photos[i].IsVisible()) {
-            this.Clusters[this.MAXZOOMLEVEL].push(new Cluster(this.Photos[i]));
-        }
-    }
-}
+        return newCluster;
+    };
 
-PhotoManager.prototype.DoCluster = function () {
-    // Performance marker
-    window.performance.mark("mark_start_DoCluster");
+    var getClusterThreshold = function (zoomLevel) {
+        var mapScale = 591657550.500000 / Math.pow(2, (zoomLevel - 1));
+        return (mapScale / 100.0) / 2.0;
+    };
 
-    var newDistanceMatrix = this.CopyDistanceMatrix();
-    this.Cluster(this.MAXZOOMLEVEL, newDistanceMatrix);
+    var createIcon = function (numPhotos) {
+        var totalVisiblePhotos = tagManager.GetVisiblePhotosCount();
+        var extraScale = (numPhotos / totalVisiblePhotos) * CIRCLESCALERANGE;
+        var scale = MINCIRCLESCALE + extraScale;
 
-    // Performance marker
-    window.performance.mark("mark_end_DoCluster");
-}
+        return {
+            fillColor: 'red',
+            fillOpacity: 0.5,
+            strokeColor: 'white',
+            strokeWeight: 0.5,
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: scale
+        };
+    };
 
-PhotoManager.prototype.Cluster = function (zoomLevel, distanceMatrix) {
-    if (zoomLevel >= this.MINZOOMLEVEL) {
-        var clusterThreshold = GetClusterThreshold(zoomLevel);
+    var cluster = function (zoomLevel, distanceMatrix) {
+        if (zoomLevel >= MINZOOMLEVEL) {
+            var clusterThreshold = getClusterThreshold(zoomLevel);
 
-        while (distanceMatrix.length > 1) {
-            // Determine which two clusters to merge, and their distance
-            var nextCluster = this.GetClosestCluster(distanceMatrix);
+            while (distanceMatrix.length > 1) {
+                // Determine which two clusters to merge, and their distance
+                var nextCluster = getClosestCluster(distanceMatrix);
 
-            // If the smallest distance between clusters is greater than the threshold, then break
-            if (nextCluster.distance > clusterThreshold) break;
+                // If the smallest distance between clusters is greater than the threshold, then break
+                if (nextCluster.distance > clusterThreshold) break;
 
-            // Add a new row and column for the new cluster
-            distanceMatrix.push(new Array(distanceMatrix.length + 1));
+                // Add a new row and column for the new cluster
+                distanceMatrix.push(new Array(distanceMatrix.length + 1));
 
-            // Populate the distances of every existing cluster that will remain to our new cluster
-            for (var i = 0; i < distanceMatrix.length - 1; i++) {
-                // Skip the ones that will be removed
-                if (i == nextCluster.cluster1 || i == nextCluster.cluster2) continue;
+                // Populate the distances of every existing cluster that will remain to our new cluster
+                for (var i = 0; i < distanceMatrix.length - 1; i++) {
+                    // Skip the ones that will be removed
+                    if (i == nextCluster.cluster1 || i == nextCluster.cluster2) continue;
 
-                // Determine the distance between this cluster and our new cluster by using max d[this, c1], d[this, c2]
-                var newDistance = Math.max(distanceMatrix[i][nextCluster.cluster1], distanceMatrix[i][nextCluster.cluster2]);
-                distanceMatrix[i].push(newDistance);
+                    // Determine the distance between this cluster and our new cluster by using max d[this, c1], d[this, c2]
+                    var newDistance = Math.max(distanceMatrix[i][nextCluster.cluster1], distanceMatrix[i][nextCluster.cluster2]);
+                    distanceMatrix[i].push(newDistance);
+                }
+
+                // Populate the distance array of the new cluster
+                for (var i = 0; i < distanceMatrix[distanceMatrix.length - 1].length; i++) {
+                    // Skip the ones that will be removed
+                    if (i == nextCluster.cluster1 || i == nextCluster.cluster2) continue;
+
+                    // Determine the distance between this cluster and our new cluster by using max d[c1, this], d[c2, this]
+                    var newDistance = Math.max(distanceMatrix[nextCluster.cluster1][i], distanceMatrix[nextCluster.cluster2][i]);
+                    distanceMatrix[distanceMatrix.length - 1][i] = newDistance;
+                }
+
+                // Set the distance between the cluster to itself to 0
+                distanceMatrix[distanceMatrix.length - 1][distanceMatrix.length - 1] = 0;
+
+                // Delete the old rows and columns
+                // Ensure we get the delete ordering right
+                var deleteFirst = Math.min(nextCluster.cluster1, nextCluster.cluster2);
+                var deleteLast = Math.max(nextCluster.cluster1, nextCluster.cluster2);
+                distanceMatrix.splice(deleteFirst, 1);
+                distanceMatrix.splice(deleteLast - 1, 1);
+
+                for (var i = 0; i < distanceMatrix.length; i++) {
+                    distanceMatrix[i].splice(deleteFirst, 1);
+                    distanceMatrix[i].splice(deleteLast - 1, 1);
+                }
+
+                // Delete the old clusters and add the new one to our clusters array
+                clusters[zoomLevel].push(mergeClusters(clusters[zoomLevel][nextCluster.cluster1], clusters[zoomLevel][nextCluster.cluster2]));
+                clusters[zoomLevel].splice(deleteFirst, 1);
+                clusters[zoomLevel].splice(deleteLast - 1, 1);
             }
 
-            // Populate the distance array of the new cluster
-            for (var i = 0; i < distanceMatrix[distanceMatrix.length - 1].length; i++) {
-                // Skip the ones that will be removed
-                if (i == nextCluster.cluster1 || i == nextCluster.cluster2) continue;
-
-                // Determine the distance between this cluster and our new cluster by using max d[c1, this], d[c2, this]
-                var newDistance = Math.max(distanceMatrix[nextCluster.cluster1][i], distanceMatrix[nextCluster.cluster2][i]);
-                distanceMatrix[distanceMatrix.length - 1][i] = newDistance;
+            // As long as we aren't processing the minimum zoom level, we need to copy the clusters array into the next level to be processed
+            if (zoomLevel != MINZOOMLEVEL) {
+                clusters[zoomLevel - 1] = copyClusterArray(clusters[zoomLevel]);
             }
 
-            // Set the distance between the cluster to itself to 0
-            distanceMatrix[distanceMatrix.length - 1][distanceMatrix.length - 1] = 0;
-
-            // Delete the old rows and columns
-            // Ensure we get the delete ordering right
-            var deleteFirst = Math.min(nextCluster.cluster1, nextCluster.cluster2);
-            var deleteLast = Math.max(nextCluster.cluster1, nextCluster.cluster2);
-            distanceMatrix.splice(deleteFirst, 1);
-            distanceMatrix.splice(deleteLast - 1, 1);
-
-            for (var i = 0; i < distanceMatrix.length; i++) {
-                distanceMatrix[i].splice(deleteFirst, 1);
-                distanceMatrix[i].splice(deleteLast - 1, 1);
-            }
-
-            // Delete the old clusters and add the new one to our clusters array
-            this.Clusters[zoomLevel].push(MergeClusters(this.Clusters[zoomLevel][nextCluster.cluster1], this.Clusters[zoomLevel][nextCluster.cluster2]));
-            this.Clusters[zoomLevel].splice(deleteFirst, 1);
-            this.Clusters[zoomLevel].splice(deleteLast - 1, 1);
+            // Recurse
+            cluster(zoomLevel - 1, distanceMatrix);
         }
-
-        // As long as we aren't processing the minimum zoom level, we need to copy the clusters array into the next level to be processed
-        if (zoomLevel != this.MINZOOMLEVEL) {
-            this.Clusters[zoomLevel - 1] = this.CopyClusterArray(this.Clusters[zoomLevel]);
-        }
-
-        // Recurse
-        this.Cluster(zoomLevel - 1, distanceMatrix);
-    }
-    // Base case
-    else {
-        // We are done!
-    }
-}
-
-PhotoManager.prototype.OnVisiblePhotosUpdated = function () {
-    // First update the status of each photo object
-    var visiblePhotoSet = tagManager.GetVisiblePhotos();
-
-    for (var i = 0; i < photoManager.Photos.length; i++) {
-        if (visiblePhotoSet.has(i)) {
-            photoManager.Photos[i].SetIsVisible(true);
-        }
+        // Base case
         else {
-            photoManager.Photos[i].SetIsVisible(false);
+            // We are done!
         }
-    }
+    };
 
-    // Now recalculate the clusters and redraw the markers
-    photoManager.SetupForCluster();
-    photoManager.DoCluster();
-    photoManager.ClearAllMarkers(true);
-    photoManager.CreateMarkers();
-}
+    // Public members
+    return {
+        loadPhotos: function (testMode) {
+            // Performance marker
+            window.performance.mark("mark_start_loadPhotos");
 
-// Variables
-PhotoManager.prototype.PhotoViewer = null;
-PhotoManager.prototype.PhotoDistances = null;
-PhotoManager.prototype.Clusters = null;
-PhotoManager.prototype.Photos = null;
-PhotoManager.prototype.Markers = null;
+            // If testMode is true, pull photos from a smaller test database
+            var args = testMode === true ? "?testMode=true" : "";
 
-function Cluster(photo) {
-    this.Photos = [];
+            return $.getJSON('../dataaccess/getphotos.php' + args, function (data) {
+                $.each(data, function (key, val) {
+                    var newPhoto = new Photo(val.filename, parseFloat(val.latitude), parseFloat(val.longitude), val.locationstring, val.tagsstring, val.datetaken);
+                    photos.push(newPhoto);
+                    tagManager.RegisterPhoto(newPhoto, photos.length - 1);
+                });
+            });
+        },
+        createMarkers: function () {
+            for (var i = 0; i < clusters[map.zoom].length; i++) {
+                var position = { lat: clusters[map.zoom][i].GetLatitude(), lng: clusters[map.zoom][i].GetLongitude() };
+                var name = "Cluster " + i;
 
-    if (photo !== undefined) {
-        this.Photos.push(photo);
-    }
-}
+                var marker = new google.maps.Marker({
+                    position: position,
+                    map: map
+                });
 
-Cluster.prototype.AddPhoto = function(photo) {
-    this.Photos.push(photo);
-}
+                var clusterPhotos = clusters[map.zoom][i].GetPhotos();
+                marker.setIcon(createIcon(clusterPhotos.length));
 
-Cluster.prototype.AddPhotos = function (photos) {
-    this.Photos = this.Photos.concat(photos);
-}
+                // Single photo case
+                if (clusterPhotos.length == 1) {
+                    marker.type = 'photo';
+                    marker.setTitle("1 photo");
+                    marker.id = i
 
-Cluster.prototype.GetPhotos = function () {
-    return this.Photos;
-}
+                    marker.addListener('click', function () {
+                        photoViewer.showCollection(new PhotoCollection(PhotoCollection.Type.SINGLE, photoManager.clusterAt(map.zoom)[this.id].GetPhotos()));
+                    });
+                }
 
-Cluster.prototype.GetLatitude = function () {
-    var latAgg = 0;
+                else {
+                    marker.type = 'cluster';
+                    marker.setTitle(clusterPhotos.length + " photos");
+                    marker.id = i;
 
-    for (var i = 0; i < this.Photos.length; i++) {
-        latAgg += this.Photos[i].GetLatitude();
-    }
+                    marker.addListener('click', function () {
+                        photoViewer.showCollection(new PhotoCollection(PhotoCollection.Type.CLUSTER, photoManager.clusterAt(map.zoom)[this.id].GetPhotos()));
+                    });
+                }
 
-    latAgg /= parseFloat(this.Photos.length);
+                markers.push(marker);
+            }
+        },
+        clearAllmarkers: function (deletemarkers) {
+            for (var i = 0; i < markers.length; i++) {
+                markers[i].setMap(null);
+            }
 
-    return latAgg;
-}
+            if (deletemarkers) {
+                markers = [];
+            }
+        },
+        getRelativePathToPhoto: function (filename) {
+            return PHOTOPATH + filename;
+        },
+        calculatePhotoDistances: function () {
+            // Performance marker
+            window.performance.mark("mark_start_calculatePhotoDistances");
 
-Cluster.prototype.GetLongitude = function () {
-    var longAgg = 0;
+            // Create 2D array to store distances
+            photoDistances = new Array(photos.length);
+            for (var i = 0; i < photos.length; i++) {
+                photoDistances[i] = new Array(photos.length);
+            }
 
-    for (var i = 0; i < this.Photos.length; i++) {
-        longAgg += this.Photos[i].GetLongitude();
-    }
+            // Iterate over photos and compare distances
+            for (var i = 0; i < photoDistances.length; i++) {
+                for (var j = 0; j < photoDistances[i].length; j++) {
+                    // handle the case where i == j
+                    if (i == j) {
+                        photoDistances[i][j] = 0;
+                        continue;
+                    }
 
-    longAgg /= parseFloat(this.Photos.length);
+                    // Compute the distance between coordinates using the haversine method
+                    // http://www.movable-type.co.uk/scripts/latlong.html
+                    var lat1rad = photos[i].GetLatitude().toRadians();
+                    var lat2rad = photos[j].GetLatitude().toRadians();
+                    var deltalatrad = (photos[i].GetLatitude() - photos[j].GetLatitude()).toRadians();
+                    var deltalongrad = (photos[i].GetLongitude() - photos[j].GetLongitude()).toRadians();
 
-    return longAgg;
-}
+                    var a = Math.sin(deltalatrad / 2) * Math.sin(deltalatrad / 2) +
+                        Math.cos(lat1rad) * Math.cos(lat2rad) *
+                        Math.sin(deltalongrad / 2) * Math.sin(deltalongrad / 2);
 
-Cluster.prototype.Clone = function () {
-    var copy = new Cluster();
+                    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    copy.AddPhotos(this.Photos);
+                    var d = R * c;
 
-    return copy;
-}
+                    photoDistances[i][j] = d;
+                }
+            }
 
-function MergeClusters(cluster1, cluster2) {
-    var newCluster = new Cluster();
+            // Performance marker
+            window.performance.mark("mark_end_calculatePhotoDistances");
+        },
+        setupForCluster: function () {
+            // Create the clusters data structure
+            clusters = new Array(MAXZOOMLEVEL + 1); // Need to have max level + 1 elements since 0 is a valid zoom level
 
-    newCluster.AddPhotos(cluster1.GetPhotos());
-    newCluster.AddPhotos(cluster2.GetPhotos());
-    
-    return newCluster;
-}
+            for (var i = 0; i < clusters.length; i++) {
+                clusters[i] = new Array();
+            }
 
-//TODO: Move this function
-// Returns the (approximate) distance in meters per centimeter of map
-function GetClusterThreshold(zoomLevel) {
-    var mapScale = 591657550.500000 / Math.pow(2, (zoomLevel - 1));
-    return (mapScale / 100.0) / 2.0;
-}
+            // Initially populate the highest zoom level with each photo as its own cluster (only if the photo is visible)
+            for (var i = 0; i < photos.length; i++) {
+                if (photos[i].IsVisible()) {
+                    clusters[MAXZOOMLEVEL].push(new Cluster(photos[i]));
+                }
+            }
+        },
+        doCluster: function () {
+            // Performance marker
+            window.performance.mark("mark_start_doCluster");
+
+            var newDistanceMatrix = copyDistanceMatrix();
+            cluster(MAXZOOMLEVEL, newDistanceMatrix);
+
+            // Performance marker
+            window.performance.mark("mark_end_doCluster");
+        },
+        clusterAt: function (index) {
+            return clusters[index];
+        },
+        onVisiblephotosUpdated: function () {
+            // First update the status of each photo object
+            var visiblePhotoset = tagManager.GetVisiblePhotos();
+
+            for (var i = 0; i < photos.length; i++) {
+                if (visiblePhotoset.has(i)) {
+                    photos[i].SetIsVisible(true);
+                }
+                else {
+                    photos[i].SetIsVisible(false);
+                }
+            }
+
+            // Now recalculate the clusters and redraw the markers
+            setupForCluster();
+            doCluster();
+            clearAllmarkers(true);
+            createMarkers();
+        }
+    };
+}();
 
 //TODO: Move this to a util script or something
 if (Number.prototype.toRadians === undefined) {
-    Number.prototype.toRadians = function () { return this * Math.PI / 180; };
+    Number.prototype.toRadians = function () {
+        return this * Math.PI / 180;
+    };
 }

@@ -46,8 +46,10 @@
   <ItemGroup>
     <Content Include="images\circle_loader.gif" />
     <Content Include="images\loader.gif" />
+    <Content Include="script\Cluster.js" />
     <Content Include="script\jquery\jquery-3.0.0.js" />
     <Content Include="script\jquery\jquery-ui.js" />
+    <Content Include="script\PhotoCollection.js" />
     <Content Include="script\PhotoDetailControl.js" />
     <Content Include="script\TagMenuControl.js" />
     <Content Include="script\Photo.js" />

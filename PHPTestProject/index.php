@@ -38,7 +38,7 @@
         #modalpane {
             height: 100%;
             width: 100%;
-            opacity: 0.7;
+            opacity: 0.9;
             background-color: black;
             display: none;
             z-index: 1;
@@ -53,7 +53,7 @@
             flex-direction: row;
             justify-content: center;
             align-items: center;
-            z-index: 2;
+            z-index: 3;
         }
 
         #loadingpane img {
@@ -61,12 +61,13 @@
         }
 
         #photodiv {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            height: 100%;
+            width: 100%;
             z-index: 2;
             display: none;
+            position: absolute;
+            top: 0px;
+            left: 0px;
         }
     </style>
     <link rel="stylesheet" href="style/jquery-ui.min.css" />
@@ -77,12 +78,14 @@
     <link rel="stylesheet" href="style/TopToolbar.css" />
     <script src="script/jquery/jquery-3.0.0.js"></script>
     <script src="script/jquery/jquery-ui.js"></script>
+    <script src="script/Cluster.js"></script>
     <script src="script/TagMenuControl.js"></script>
     <script src="script/Photo.js"></script>
+    <script src="script/PhotoCollection.js"></script>
     <script src="script/PhotoDetailControl.js"></script>
-    <script src="script/PhotoManager.js"></script>
     <script src="script/PhotoViewer.js"></script>
     <script src="script/Sidebar.js"></script>
+    <script src="script/PhotoManager.js"></script>
     <script src="script/TagManager.js"></script>
     <script src="script/TopToolbar.js"></script>
 </head>
@@ -105,7 +108,6 @@
     }
     ?>
     <script language="javascript">
-        var photoManager = new PhotoManager();
         var tagManager = new TagManager();
         
         var map; // The global map object
@@ -119,8 +121,8 @@
             });
 
             map.addListener('zoom_changed', function () {
-                photoManager.ClearAllMarkers(true);
-                photoManager.CreateMarkers();
+                photoManager.clearAllMarkers(true);
+                photoManager.createMarkers();
             });
 
             // Append the modal pane on top of the map so that it will block interaction when shown
@@ -131,7 +133,6 @@
             // Append the photo viewer div on top of the modal pane so that it will show over it
             var photoDiv = document.createElement("div");
             photoDiv.id = "photodiv";
-            photoDiv.tabindex = 1;
             document.getElementById('map').appendChild(photoDiv);
 
             // Append the loading div on top of everything
@@ -152,7 +153,10 @@
             sidebar.createWidget();
             sidebar.show();
 
-            $.when(photoManager.LoadPhotos(testMode))
+            // Initialize the photoViewer
+            photoViewer.setParent(document.getElementById('photodiv'));
+        
+            $.when(photoManager.loadPhotos(testMode))
                 .done(function () {
                     // Performance marker
                     window.performance.mark("mark_end_LoadPhotos");
@@ -164,13 +168,13 @@
                     // Register the photoDetailControl
                     sidebar.registerControl(photoDetailControl);
 
-                    $.when(photoManager.CalculatePhotoDistances())
+                    $.when(photoManager.calculatePhotoDistances())
                         .done(function () {
-                            photoManager.SetupForCluster();
+                            photoManager.setupForCluster();
 
-                            $.when(photoManager.DoCluster())
+                            $.when(photoManager.doCluster())
                                 .done(function () {
-                                    photoManager.CreateMarkers();
+                                    photoManager.createMarkers();
 
                                     $('#loadingpane').remove();
                                 });
@@ -181,7 +185,7 @@
                 });
 
             // Bind custom event handlers
-            $(document).on("TagManager:VisiblePhotosUpdated", photoManager.OnVisiblePhotosUpdated);
+            $(document).on("TagManager:VisiblePhotosUpdated", photoManager.onVisiblePhotosUpdated);
         });
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD1vK0IbVjCnwIH-Qjnb6deC6EDktJPrWI&callback=initMap"
