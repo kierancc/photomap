@@ -7,6 +7,19 @@
     containerElement = document.createElement("div");
     containerElement.id = "PhotoDetailControlContainer";
 
+    // Photo number of set
+    var photoNumberLabel = document.createElement("span");
+    photoNumberLabel.className = "PhotoDetailBigLabel";
+    $(photoNumberLabel).text("Photo Number");
+    containerElement.appendChild(photoNumberLabel);
+
+    var photoNumberSpan = document.createElement("span");
+    photoNumberSpan.id = "photoNumberSpan";
+    photoNumberSpan.className = "PhotoDetailValue";
+    containerElement.appendChild(photoNumberSpan);
+
+    containerElement.appendChild(document.createElement("br"));
+
     // Filename
     var filenameLabel = document.createElement("span");
     filenameLabel.className = "PhotoDetailBigLabel";
@@ -85,7 +98,8 @@
         getContainerElement: function () {
             return containerElement;
         },
-        showPhotoDetails: function (photo) {
+        showPhotoDetails: function (photo, photoIndex, collectionSize) {
+            $(photoNumberSpan).text(photoIndex + 1 + " / " + collectionSize);
             $(filenameSpan).text(photo.GetFilename());
             $(dateTakenSpan).text(photo.GetDateTaken());
             $(locationStringSpan).text(photo.GetLocationString());

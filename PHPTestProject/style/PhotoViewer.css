@@ -25,6 +25,8 @@
     padding-top: 5px;
     padding-right: 5px;
     text-decoration: none;
+    font-family: Arial;
+    font-weight: bold;
 }
 
 #PhotoViewerPrevButton {

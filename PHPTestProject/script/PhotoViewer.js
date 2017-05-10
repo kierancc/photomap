@@ -28,7 +28,7 @@
             $(viewerElement).fadeIn(100);
 
             // Update the sidebar
-            photoDetailControl.showPhotoDetails(currentCollection.photos[currentCollection.index]);
+            photoDetailControl.showPhotoDetails(currentCollection.photos[currentCollection.index], currentCollection.index, currentCollection.photos.length);
         }
         else if (currentCollection.index === (currentCollection.photos.length - 1)) {
             alert("You are viewing the last photo in this collection");
@@ -48,7 +48,7 @@
             $(viewerElement).fadeIn(100);
 
             // Update the sidebar
-            photoDetailControl.showPhotoDetails(currentCollection.photos[currentCollection.index]);
+            photoDetailControl.showPhotoDetails(currentCollection.photos[currentCollection.index], currentCollection.index, currentCollection.photos.length);
         }
         else {
             alert("You are viewing the first photo in this collection");
@@ -85,6 +85,16 @@
                 $(this).fadeTo(150, 0);
             });
         $(containerElement).append(nextButton);
+    };
+
+    var enablePrevNextButtons = function () {
+        $('#PhotoViewerPrevButton').show();
+        $('#PhotoViewerNextButton').show();
+    };
+
+    var disablePrevNextButtons = function () {
+        $('#PhotoViewerPrevButton').hide();
+        $('#PhotoViewerNextButton').hide();
     };
 
     var showPrevNextButtons = function () {
@@ -139,7 +149,7 @@
     var onFirstImageLoaded = function (e) {
         viewerElement.appendChild(currentCollection.images[0]);
         sidebar.showControl(photoDetailControl.getFriendlyName());
-        photoDetailControl.showPhotoDetails(currentCollection.photos[0]);
+        photoDetailControl.showPhotoDetails(currentCollection.photos[0], 0, currentCollection.photos.length);
     };
 
     var loadPhotos = function () {
@@ -187,10 +197,10 @@
     viewerElement = document.createElement("div");
     viewerElement.id = "PhotoViewer";
 
-    $(containerElement).append(viewerElement);
-
-    // Create the prev and next buttons
+    // Create prev/next buttons
     createPrevNextButtons();
+
+    $(containerElement).append(viewerElement);
 
     // Bind events
     $(document).on("photoViewer:firstImageLoaded", onFirstImageLoaded);
@@ -210,6 +220,20 @@
             
             $('#modalpane').fadeIn(1500);
             $(parentElement).fadeIn(1500, function () {
+                // Enable prev/next buttons if more than one picture to show
+                if (currentCollection.getType() === PhotoCollection.Type.CLUSTER)
+                {
+                    enablePrevNextButtons();
+
+                    showPrevNextButtons();
+                    window.setTimeout(function () {
+                        hidePrevNextButtons();
+                    }, 1000);
+                }
+                else {
+                    disablePrevNextButtons();
+                }
+
                 // Set focus on the photo viewer
                 $('#PhotoViewerContainer').focus();
                 enableKeyListeners();
