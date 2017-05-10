@@ -23,7 +23,7 @@
 }
 
 .TagMenuControlTagListItem {
-    height: 25px;
+    height: auto;
     width: 80%;
     color: blue;
     margin: auto;
