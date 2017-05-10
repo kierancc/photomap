@@ -216,7 +216,7 @@
                 markers.push(marker);
             }
         },
-        clearAllmarkers: function (deletemarkers) {
+        clearAllMarkers: function (deletemarkers) {
             for (var i = 0; i < markers.length; i++) {
                 markers[i].setMap(null);
             }
@@ -313,7 +313,7 @@
             // Now recalculate the clusters and redraw the markers
             setupForCluster();
             doCluster();
-            clearAllmarkers(true);
+            clearAllMarkers(true);
             createMarkers();
         }
     };
