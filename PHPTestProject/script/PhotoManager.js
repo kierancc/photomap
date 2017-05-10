@@ -297,7 +297,7 @@
         clusterAt: function (index) {
             return clusters[index];
         },
-        onVisiblephotosUpdated: function () {
+        onVisiblePhotosUpdated: function () {
             // First update the status of each photo object
             var visiblePhotoset = tagManager.GetVisiblePhotos();
 
@@ -311,10 +311,10 @@
             }
 
             // Now recalculate the clusters and redraw the markers
-            setupForCluster();
-            doCluster();
-            clearAllMarkers(true);
-            createMarkers();
+            photoManager.setupForCluster();
+            photoManager.doCluster();
+            photoManager.clearAllMarkers(true);
+            photoManager.createMarkers();
         }
     };
 }();
