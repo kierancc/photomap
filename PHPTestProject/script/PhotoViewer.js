@@ -29,6 +29,7 @@
 
             // Update the sidebar
             photoDetailControl.showPhotoDetails(currentCollection.photos[currentCollection.index], currentCollection.index, currentCollection.photos.length);
+            photoManager.markPhotoAsViewed(currentCollection.photos[currentCollection.index].GetFilename());
         }
         else if (currentCollection.index === (currentCollection.photos.length - 1)) {
             alert("You are viewing the last photo in this collection");
@@ -49,6 +50,7 @@
 
             // Update the sidebar
             photoDetailControl.showPhotoDetails(currentCollection.photos[currentCollection.index], currentCollection.index, currentCollection.photos.length);
+            photoManager.markPhotoAsViewed(currentCollection.photos[currentCollection.index].GetFilename());
         }
         else {
             alert("You are viewing the first photo in this collection");
@@ -150,6 +152,7 @@
         viewerElement.appendChild(currentCollection.images[0]);
         sidebar.showControl(photoDetailControl.getFriendlyName());
         photoDetailControl.showPhotoDetails(currentCollection.photos[0], 0, currentCollection.photos.length);
+        photoManager.markPhotoAsViewed(currentCollection.photos[0].GetFilename());
     };
 
     var loadPhotos = function () {

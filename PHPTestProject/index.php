@@ -155,6 +155,8 @@
 
             // Initialize the photoViewer
             photoViewer.setParent(document.getElementById('photodiv'));
+
+            photoManager.loadViewedPhotosFromCookie();
         
             $.when(photoManager.loadPhotos(testMode))
                 .done(function () {

@@ -15,6 +15,7 @@
     var clusters = [];
     var photos = [];
     var markers = [];
+    var viewedPhotos = [];
 
     // Functions
     // Clustering Functions
@@ -78,13 +79,13 @@
         return (mapScale / 100.0) / 2.0;
     };
 
-    var createIcon = function (numPhotos) {
+    var createIcon = function (numPhotos, notViewedPhotos) {
         var totalVisiblePhotos = tagManager.GetVisiblePhotosCount();
         var extraScale = (numPhotos / totalVisiblePhotos) * CIRCLESCALERANGE;
         var scale = MINCIRCLESCALE + extraScale;
 
         return {
-            fillColor: 'red',
+            fillColor: notViewedPhotos === true ? 'red' : 'green',
             fillOpacity: 0.5,
             strokeColor: 'white',
             strokeWeight: 0.5,
@@ -162,8 +163,58 @@
         }
     };
 
+    var clusterHasNotViewedPhotos = function (clusterIndex) {
+        var clusterPhotos = clusters[map.zoom][clusterIndex].GetPhotos();
+        for (var i = 0; i < clusterPhotos.length; i++) {
+            var keyName = "photo_" + clusterPhotos[i].GetFilename();
+
+            if (viewedPhotos[keyName] === undefined || viewedPhotos[keyName] === false) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
     // Public members
     return {
+        loadViewedPhotosFromCookie: function () {
+            // Performance marker
+            window.performance.mark("mark_start_loadViewedPhotosFromCookie");
+
+            // If there is a cookie saved, it will contain the viewed photo data like so:
+            // "1234.jpg=true;"
+            if (document.cookie !== "") {
+                var photoArray = document.cookie.split(";");
+
+                for (var i = 0; i < photoArray.length; i++) {
+                    var parts = photoArray[i].split("=");
+
+                    if (parts[0].search("photo_") !== -1) {
+                        viewedPhotos[parts[0].trim()] =  parts[1].trim() == "true";
+                    }
+                }
+            }
+
+            // Performance marker
+            window.performance.mark("mark_end_loadViewedPhotosFromCookie");
+        },
+        markPhotoAsViewed: function (photoName) {
+            viewedPhotos["photo_" + photoName] = true;
+
+            var date = new Date();
+            date.setTime(date.getTime() + (365 * 24 * 60 * 60 * 1000));
+            var expires = "expires=" + date.toGMTString();
+            document.cookie = "photo_" + photoName + "=true;" + expires + "; path=/";
+        },
+        markPhotoAsNotViewed: function (photoName) {
+            viewedPhotos["photo_" + photoName] = false;
+
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            var expires = "expires=" + date.toGMTString();
+            document.cookie = "photo_" + photoName + "=false;" + expires + "; path=/";
+        },
         loadPhotos: function (testMode) {
             // Performance marker
             window.performance.mark("mark_start_loadPhotos");
@@ -180,6 +231,9 @@
             });
         },
         createMarkers: function () {
+            // Performance marker
+            window.performance.mark("mark_start_createMarkers");
+
             for (var i = 0; i < clusters[map.zoom].length; i++) {
                 var position = { lat: clusters[map.zoom][i].GetLatitude(), lng: clusters[map.zoom][i].GetLongitude() };
                 var name = "Cluster " + i;
@@ -190,7 +244,8 @@
                 });
 
                 var clusterPhotos = clusters[map.zoom][i].GetPhotos();
-                marker.setIcon(createIcon(clusterPhotos.length));
+                var notViewedPhotos = clusterHasNotViewedPhotos(i);
+                marker.setIcon(createIcon(clusterPhotos.length, notViewedPhotos));
 
                 // Single photo case
                 if (clusterPhotos.length == 1) {
@@ -215,8 +270,14 @@
 
                 markers.push(marker);
             }
+
+            // Performance marker
+            window.performance.mark("mark_end_createMarkers");
         },
         clearAllMarkers: function (deletemarkers) {
+            // Performance marker
+            window.performance.mark("mark_start_clearAllMarkers");
+
             for (var i = 0; i < markers.length; i++) {
                 markers[i].setMap(null);
             }
@@ -224,6 +285,9 @@
             if (deletemarkers) {
                 markers = [];
             }
+
+            // Performance marker
+            window.performance.mark("mark_end_clearAllMarkers");
         },
         getRelativePathToPhoto: function (filename) {
             return PHOTOPATH + filename;
