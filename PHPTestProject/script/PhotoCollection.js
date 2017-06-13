@@ -4,6 +4,7 @@ function PhotoCollection(type, photos) {
     this.photos = photos;
     this.index = 0;
     this.images = new Array(this.photos.length);
+    this.loadedImages = 0;
 }
 
 // Members

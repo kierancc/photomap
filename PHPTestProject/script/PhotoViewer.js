@@ -15,7 +15,26 @@
         $(parentElement).fadeOut(1500, function () {
             $(viewerElement).empty();
             currentCollection = null;
-        });            
+        });
+
+        $(carouselElement).empty();
+    };
+
+    var showSpecificPhoto = function (photoID) {
+        if (photoID < 0 || photoID >= currentCollection.photos.length) {
+            return;
+        }
+        else {
+            currentCollection.index = photoID;
+            $(viewerElement).hide();
+            $(viewerElement).empty();
+            $(viewerElement).append(currentCollection.images[currentCollection.index]);
+            $(viewerElement).fadeIn(100);
+
+            // Update the sidebar
+            photoDetailControl.showPhotoDetails(currentCollection.photos[currentCollection.index], currentCollection.index, currentCollection.photos.length);
+            photoManager.markPhotoAsViewed(currentCollection.photos[currentCollection.index].GetFilename());
+        }
     };
 
     var showNextPhoto = function () {
@@ -162,11 +181,17 @@
 
             image.onload = function () {
                 currentCollection.images[key] = this;
+                currentCollection.loadedImages++;
 
                 // If the image loaded is the first image, trigger an event for this
                 // so that the loading gif will be removed and the image shown
                 if (key === 0) {
                     $(document).trigger("photoViewer:firstImageLoaded");
+                }
+
+                // If this is the last image to be loaded, trigger an evevnt for this
+                if (currentCollection.loadedImages === currentCollection.photos.length) {
+                    $(document).trigger("photoViewer:allPhotosLoaded");
                 }
             };
 
@@ -176,6 +201,23 @@
 
             image.src = fullRelPath;
         });
+    };
+
+    var onAllPhotosLoaded = function (e) {
+        buildCarousel();
+    };
+
+    var buildCarousel = function () {
+        for (var i = 0; i < currentCollection.images.length; i++) {
+            var img = new Image();
+            img = currentCollection.images[i].cloneNode(true);
+            $(img).data("id", i);
+            $(img).click(function () {
+                showSpecificPhoto($(this).data("id"));
+            });
+
+            $(carouselElement).append(img);
+        }
     };
 
     // "Constructor"
@@ -200,13 +242,19 @@
     viewerElement = document.createElement("div");
     viewerElement.id = "PhotoViewer";
 
+    // Build the carousel
+    carouselElement = document.createElement("div");
+    carouselElement.id = "ThumbnailCarousel";
+
     // Create prev/next buttons
     createPrevNextButtons();
 
     $(containerElement).append(viewerElement);
+    $(containerElement).append(carouselElement);
 
     // Bind events
     $(document).on("photoViewer:firstImageLoaded", onFirstImageLoaded);
+    $(document).on("photoViewer:allPhotosLoaded", onAllPhotosLoaded);
 
     // Public members
     return {
@@ -219,29 +267,28 @@
         },
         showCollection: function (newCollection) {
             currentCollection = newCollection;
-            loadPhotos();
-            
-            $('#modalpane').fadeIn(1500);
-            $(parentElement).fadeIn(1500, function () {
-                // Enable prev/next buttons if more than one picture to show
-                if (currentCollection.getType() === PhotoCollection.Type.CLUSTER)
-                {
-                    enablePrevNextButtons();
+            $.when(loadPhotos())
+                .done(function () {
+                    $('#modalpane').fadeIn(1500);
+                    $(parentElement).fadeIn(1500, function () {
+                        // Enable prev/next buttons if more than one picture to show
+                        if (currentCollection.getType() === PhotoCollection.Type.CLUSTER) {
+                            enablePrevNextButtons();
 
-                    showPrevNextButtons();
-                    window.setTimeout(function () {
-                        hidePrevNextButtons();
-                    }, 1000);
-                }
-                else {
-                    disablePrevNextButtons();
-                }
+                            showPrevNextButtons();
+                            window.setTimeout(function () {
+                                hidePrevNextButtons();
+                            }, 1000);
+                        }
+                        else {
+                            disablePrevNextButtons();
+                        }
 
-                // Set focus on the photo viewer
-                $('#PhotoViewerContainer').focus();
-                enableKeyListeners();
-            });
-            
+                        // Set focus on the photo viewer
+                        $('#PhotoViewerContainer').focus();
+                        enableKeyListeners();
+                    });
+                });
         }
     };
 }();
