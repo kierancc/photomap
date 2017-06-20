@@ -61,6 +61,7 @@
         // Build up the tag list
         var tagListContainerDiv = document.createElement('div');
         tagListContainerDiv.classList.add("TagMenuControlTagListContainer");
+        tagListContainerDiv.id = "TagScrollbar";
         containerElement.appendChild(tagListContainerDiv);
 
         // Add tags to the list

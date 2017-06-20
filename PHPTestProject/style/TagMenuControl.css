@@ -23,6 +23,20 @@
     background-color: slategray;
 }
 
+#TagScrollbar::-webkit-scrollbar {
+    width: 6px;
+    background-color: lightgrey;
+}
+
+#TagScrollbar::-webkit-scrollbar-thumb {
+    background-color: #73bbdf;
+}
+
+#TagScrollbar::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: #F5F5F5;
+}
+
 .TagMenuControlTagListItem {
     height: auto;
     width: 80%;

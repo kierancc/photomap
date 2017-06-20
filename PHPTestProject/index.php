@@ -32,7 +32,8 @@
         }
 
         #sidebar {
-            flex: 0 1 200px;
+            flex: 0 0 200px;
+            max-width: 200px;
         }
 
         #modalpane {
